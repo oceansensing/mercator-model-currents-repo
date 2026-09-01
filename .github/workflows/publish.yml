@@ -35,6 +35,11 @@ on:
   # --mode`, which has accepted only `full` since the light path was retired
   # on 2026-08-27 — so dispatching `light` would fail the run outright.
   workflow_dispatch:
+    inputs:
+      force:
+        description: 'Rebuild even if the probe says the tree is current'
+        type: boolean
+        default: false
   # **Was held off until a dispatched run was green and the fetcher had a
   # probe.** Both are true as of 2026-09-01. The siblings each
   # learned this: a cron firing before `PIPELINES_SSH_KEY` can read the
@@ -221,6 +226,14 @@ jobs:
         id: run
         env:
           PIPELINE_ROOT: ${{ github.workspace }}
+          # **The escape a probe needs, and it was earned.** The probe compares
+          # the upstream's hour against what is on the stage -- and the stage
+          # is seeded from the last publish, INCLUDING a publish that was held
+          # for failing the contract. So a bad file on the stage matches its
+          # own refTime, the probe skips the rebuild, and the contract refuses
+          # the same bad file for ever. Nothing upstream changing can break
+          # that loop. This is how it is broken.
+          MERCATOR_FORCE: ${{ inputs.force }}
           COPERNICUSMARINE_SERVICE_USERNAME: ${{ secrets.COPERNICUSMARINE_SERVICE_USERNAME }}
           COPERNICUSMARINE_SERVICE_PASSWORD: ${{ secrets.COPERNICUSMARINE_SERVICE_PASSWORD }}
         run: python3 engine/pipeline/orchestrate.py run
