@@ -222,6 +222,16 @@ jobs:
       # the two workflows would not drift. The light mode went on 2026-08-27
       # and the prefixes went with it on 2026-08-28; an exact key or a cold
       # rebuild is the whole of it now.
+      # **A tier at native resolution, so a cache hit is worth minutes.** The
+      # tiles are slices of the frame the overview came from, so restoring them
+      # when the hour has not moved skips the serialisation rather than the
+      # fetch -- which for the currents is ten tiers of 20 degree boxes.
+      - name: Restore cur tiles
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ${{ steps.plan.outputs.cache-paths-mercator-cur-tiles }}
+          key: ${{ steps.plan.outputs.cache-key-mercator-cur-tiles }}
+
       - name: Fetch, validate, assemble
         id: run
         env:
@@ -238,6 +248,13 @@ jobs:
           COPERNICUSMARINE_SERVICE_PASSWORD: ${{ secrets.COPERNICUSMARINE_SERVICE_PASSWORD }}
         run: python3 engine/pipeline/orchestrate.py run
 
+
+      - name: Save cur tiles
+        if: steps.run.outputs.built-mercator-cur-tiles == 'true'
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ${{ steps.plan.outputs.cache-paths-mercator-cur-tiles }}
+          key: ${{ steps.plan.outputs.cache-key-mercator-cur-tiles }}
 
       - name: Upload the site
         if: steps.run.outputs.deploy == 'true'

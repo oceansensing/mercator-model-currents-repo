@@ -63,3 +63,30 @@ roots = ["cur-mercator.json", "cur-mercator-47m.json", "cur-mercator-186m.json",
 writes = ["cur-mercator*.json"]
 max_age_hours = 12
 namespace = ["python3", "scripts/fetch-mercator.py", "--namespace", "--only=cur-mercator"]
+
+# **Native resolution, 20 degree boxes, one tier per depth AND per lead.** A
+# forecast frame pointing at lead 0's tiles would draw the present at 1/12 deg
+# and call it the forecast -- sharp, plausible and wrong -- so the contract
+# refuses a lead file whose `tileIndex` is not its own set, and the fetcher
+# names the directories accordingly.
+#
+# **The tiles cost nothing extra upstream.** The fetch already pulls the full
+# native global frame in order to decimate it for the overview; a tile is a
+# slice of that same array. What they cost is published bytes and the time to
+# serialise them, not another read off the service.
+[products.cur-mercator.tiles]
+build = ["python3", "scripts/fetch-mercator.py", "--tiles", "--only=cur-mercator"]
+key = ["python3", "scripts/fetch-mercator.py", "--tile-key", "--only=cur-mercator"]
+cache = "mercator-cur-tiles"
+match = [
+  ["tiles-cur-mercator", "cur-mercator.json"],
+  ["tiles-cur-mercator-f*h", "cur-mercator-f*h.json"],
+  ["tiles-cur-mercator-47m", "cur-mercator-47m.json"],
+  ["tiles-cur-mercator-47m-f*h", "cur-mercator-47m-f*h.json"],
+  ["tiles-cur-mercator-186m", "cur-mercator-186m.json"],
+  ["tiles-cur-mercator-186m-f*h", "cur-mercator-186m-f*h.json"],
+  ["tiles-cur-mercator-380m", "cur-mercator-380m.json"],
+  ["tiles-cur-mercator-380m-f*h", "cur-mercator-380m-f*h.json"],
+  ["tiles-cur-mercator-1062m", "cur-mercator-1062m.json"],
+  ["tiles-cur-mercator-1062m-f*h", "cur-mercator-1062m-f*h.json"],
+]
