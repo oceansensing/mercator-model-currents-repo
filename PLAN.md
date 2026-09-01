@@ -110,6 +110,49 @@ trusted to notice.
 
 **Sea surface height therefore comes from the DAILY all-variables product.**
 
+## The tile tier
+
+**20 degree boxes at native 1/12 deg** -- exactly 240 cells a side, which is
+why the box is 20 and not 15 -- matching the ESPC currents so the two models
+tile alike and a reader zooming in makes the same shape of request of either.
+
+**It costs nothing extra upstream.** The fetch already pulls the full native
+global frame in order to decimate it for the 1 degree overview; a tile is a
+slice of that same array. What it costs is published bytes and the time to
+serialise them.
+
+**One tier per depth AND per lead.** A forecast frame pointing at lead 0's
+tiles would draw the present at 1/12 deg and call it the forecast -- sharp,
+plausible and wrong, which is the failure that looks most like success. The
+contract refuses a lead file whose `tileIndex` is not its own set.
+
+Three faults were found building it, each by a check rather than by a reader:
+
+- **Rows overlapped by one cell.** A row holds the cells whose center lies in
+  [s, s+20) and latitude descends, so the start is `floor(..) + 1`, not
+  `ceil` -- which returns the boundary itself when the division is exact, and
+  it is exact at every 20 degree edge on a 1/12 degree grid. 2049 rows
+  covering a 2041-row grid.
+- **Two lattice mutations SURVIVED the first test**, both for one reason: with
+  this grid's `lo1 = 0` every box edge divides exactly, so `floor` and `ceil`
+  agree everywhere. The lattice now derives its origin from the grid rather
+  than from a constant, and the test carries a second geometry whose origin is
+  not on a box edge.
+- **The grid-step guard read float32 noise as a re-grid.** Coordinates are
+  stored as float32, whose precision near 180 degrees is about 1.5e-5, so
+  differencing two adjacent longitudes returns 0.0833282470703125 for a grid
+  that is exactly 1/12. Derived from the whole span the error divides by 4,319
+  intervals and the step comes back to 1.2e-9. Reproduced locally before the
+  tolerance was touched.
+
+And one that was not the tier at all: **the `--tile-key` probe runs in `plan`,
+which had no Copernicus credentials**, so every product reported "tiles
+unplanned this run" -- a message naming the tiles rather than the cause.
+
+Caches are per product. The key is computed per product, so products sharing
+one cache name would each save over the others and every restore would be
+somebody else's tier.
+
 ## Open
 
 1. **The set count** — how many depths, how many leads. An ESPC-shaped set
