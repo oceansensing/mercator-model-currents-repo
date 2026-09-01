@@ -53,13 +53,15 @@ lane = "copernicus"
 [products.cur-mercator]
 title = "Mercator Ocean currents"
 step = "mercator"
-# One root per depth, each a list of two grids (u, v) -- the shape the
-# ESPC currents already publish. Named for the level that is actually
-# there, not for ESPC's nearest: -380m here is 380.21 m, and calling it
-# -350m so the two models' filenames matched would put "same word,
-# different water" into the contract. The fetcher re-checks them every run.
-roots = ["cur-mercator.json", "cur-mercator-47m.json", "cur-mercator-186m.json",
-         "cur-mercator-380m.json", "cur-mercator-1062m.json"]
+# Two point levels and three DEPTH AVERAGES, which is what the ESPC currents
+# publish. This briefly carried deep POINT levels instead -- 186m, 380m,
+# 1062m -- taken from ESPC's cap LIMITS as if they were levels. They are not:
+# `currents-avg200m` is the mean over 0-200 m, and a velocity at 186 m is a
+# different quantity. A reader comparing the two models was comparing a single
+# level against a column mean, which is the whole thing the peer exists to
+# avoid. The `-avg` in the name is what says which.
+roots = ["cur-mercator.json", "cur-mercator-47m.json", "cur-mercator-avg200m.json",
+         "cur-mercator-avg350m.json", "cur-mercator-avg1000m.json"]
 writes = ["cur-mercator*.json"]
 max_age_hours = 12
 namespace = ["python3", "scripts/fetch-mercator.py", "--namespace", "--only=cur-mercator"]
@@ -83,10 +85,10 @@ match = [
   ["tiles-cur-mercator-f*h", "cur-mercator-f*h.json"],
   ["tiles-cur-mercator-47m", "cur-mercator-47m.json"],
   ["tiles-cur-mercator-47m-f*h", "cur-mercator-47m-f*h.json"],
-  ["tiles-cur-mercator-186m", "cur-mercator-186m.json"],
-  ["tiles-cur-mercator-186m-f*h", "cur-mercator-186m-f*h.json"],
-  ["tiles-cur-mercator-380m", "cur-mercator-380m.json"],
-  ["tiles-cur-mercator-380m-f*h", "cur-mercator-380m-f*h.json"],
-  ["tiles-cur-mercator-1062m", "cur-mercator-1062m.json"],
-  ["tiles-cur-mercator-1062m-f*h", "cur-mercator-1062m-f*h.json"],
+  ["tiles-cur-mercator-avg200m", "cur-mercator-avg200m.json"],
+  ["tiles-cur-mercator-avg200m-f*h", "cur-mercator-avg200m-f*h.json"],
+  ["tiles-cur-mercator-avg350m", "cur-mercator-avg350m.json"],
+  ["tiles-cur-mercator-avg350m-f*h", "cur-mercator-avg350m-f*h.json"],
+  ["tiles-cur-mercator-avg1000m", "cur-mercator-avg1000m.json"],
+  ["tiles-cur-mercator-avg1000m-f*h", "cur-mercator-avg1000m-f*h.json"],
 ]
