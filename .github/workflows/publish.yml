@@ -208,6 +208,14 @@ jobs:
         id: plan
         env:
           PIPELINE_ROOT: ${{ github.workspace }}
+          # **The credentials belong here too, and the first tiled run is how
+          # I found out.** `plan` runs each product's `--tile-key` probe to
+          # build a cache key, and that probe reads the upstream's time axis --
+          # so without them it fails, `plan` reports "tiles unplanned this
+          # run", and the tier is silently never built. The failure names the
+          # tiles, not the credentials, which is what makes it worth a comment.
+          COPERNICUSMARINE_SERVICE_USERNAME: ${{ secrets.COPERNICUSMARINE_SERVICE_USERNAME }}
+          COPERNICUSMARINE_SERVICE_PASSWORD: ${{ secrets.COPERNICUSMARINE_SERVICE_PASSWORD }}
         run: python3 engine/pipeline/orchestrate.py plan --mode full
 
       # **One Restore and one Save per `cache` name in products.toml.** Nothing
