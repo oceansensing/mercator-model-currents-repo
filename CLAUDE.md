@@ -3,10 +3,8 @@
 Mercator ocean currents — **the horizontal currents from Mercator Ocean's global 1/12 deg analysis and forecast, at every depth this map publishes** — published as the map data
 contract's grid files.
 
-**Nothing runs yet.** This repository holds its rules, its plan and its
-decisions; there is no `pipeline/products.toml`, no workflow, and nothing
-published. What follows describes the intended shape and says where it is
-intent rather than fact.
+**It publishes, since 2026-09-01**, four times a day. What follows is what
+must not be got wrong here.
 
 <!-- DOC-DOCTRINE v1 begin — identical in all ten repositories; `check:docs` holds them equal. Edit one, sync all. -->
 ## Where truth lives, and what "update docs" means
@@ -58,7 +56,7 @@ whose rows are pinned by tests, a guide that introduces the model: each is
 the thing a reader is sent to when the short answer will not do, so each is
 the worst place for a claim that has quietly stopped being true.
 
-**"Update docs" means a sweep of all eight repositories, not the one in hand.**
+**"Update docs" means a sweep of all ten repositories, not the one in hand.**
 Docs are part of the change, never a follow-up and never a separate ask. Six
 questions, asked of every repository the change touched:
 
@@ -116,6 +114,17 @@ fact from a guess that aged.
 <!-- DOC-DOCTRINE v1 end -->
 
 ## What must not be got wrong here
+
+**A probe that trusts the stage cannot repair the stage.** The stage is seeded
+from the last publish INCLUDING a held one, so a file that failed the contract
+sits there matching its own `refTime`, the probe skips the rebuild, and the
+contract refuses the same file for ever. Nothing changing upstream breaks that
+loop. Dispatch with `force: true` -- that is what it is for, and it was earned
+on the first real publish here.
+
+**The forecast ladder goes in the base file only.** A lead file listing the
+frames is refused outright: the base is what a reader asks first, and a ladder
+repeated in every step is five copies free to disagree.
 
 **This is the currents half of Mercator, and the split is the convention
 rather than an accident.** `espc-model-repo`'s PLAN set it for every model

@@ -2,8 +2,15 @@
 
 Mercator ocean currents for the C4PO ocean map — **the horizontal currents from Mercator Ocean's global 1/12 deg analysis and forecast, at every depth this map publishes**.
 
-**Nothing runs yet.** No `pipeline/products.toml`, no workflow, nothing
-published. This describes the intended shape.
+**It publishes, since 2026-09-01.** `pipeline/products.toml` declares the
+products, the workflow builds them four times a day, and the site draws
+five current depths — 0, 47, 186, 380 and 1062 m under names that carry the model.
+
+**The layer names carry the depth that is actually there**, not ESPC's
+nearest: 47 m against 50, 186 against 200, 380 against 350, 1062 against
+1000. Labelling them with ESPC's round numbers so the two lists lined up
+would say the layers are comparable at the same depth when 380 against 350 is
+9% deeper water.
 
 `PLAN.md` carries the measurements and what is open. `DECISIONS.md` indexes
 the dated one-way decisions. **Which document gets what, and what "update
