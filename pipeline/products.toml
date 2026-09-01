@@ -1,0 +1,59 @@
+# What this repository publishes: the Mercator Ocean CURRENTS, at the depths this map draws, and nothing else.
+#
+# **A PEER to ESPC, not a fallback** (`DECISIONS.md` D1). Both models are
+# fetched every run and the reader chooses; nothing switches over, and the
+# contract's `source` and `modelRun` are what tell a reader which ocean is on
+# screen.
+#
+# **Why its own repository** (D2): the axis that costs bytes is vectors
+# against scalars. ESPC's currents are 738.7 MB of tiles against 169.5 MB for
+# its five scalar fields, so the two halves have different budgets and
+# different failure modes, and sharing a publish gate would let one hold back
+# the other.
+#
+# Two rules inherited from the ESPC siblings, both learned the hard way there:
+#
+# - **Every `roots` entry here must be one the site's `test-schema.mjs
+#   --roots` publishes.** The orchestrator exits 2 on a root the contract does
+#   not know, and stops the publish.
+# - **A product that leaves takes its files with it.** The stage is seeded
+#   from the last publish, so a root a pipeline stops writing is carried
+#   forward for ever.
+#
+# **The credentials are this repository's, not the site's.** The fetcher runs
+# here, so `COPERNICUSMARINE_SERVICE_USERNAME` and `_PASSWORD` are secrets on
+# this repository. There is no API key. And because this repository is PUBLIC
+# while the site is not, everything the fetcher prints goes through its
+# `mask()` -- the toolbox announces which account it logged in as.
+
+# **The paths are relative to the site checkout, not to this workspace.** The
+# orchestrator runs these with the site checkout as their working directory.
+[contract]
+check = ["node", "scripts/test-schema.mjs"]
+roots = ["node", "scripts/test-schema.mjs", "--roots"]
+
+[defaults]
+timeout_minutes = 30
+
+# **Its own lane, named for the SERVER.** A lane is a lock: two steps sharing
+# one never run together. Copernicus is not HYCOM, so this contends with
+# nothing here -- and naming the lane after the service keeps that true when a
+# second Copernicus product lands beside it.
+[steps.mercator]
+cmd = ["python3", "scripts/fetch-mercator.py", "--only=cur-mercator"]
+lane = "copernicus"
+
+# **Hours, and they are the upstream's rather than ours.** `max_age_hours`
+# measures the reader's distance from the newest published valid time.
+# Mercator's currents are 6-hourly and its scalars daily, so the two halves
+# are allowed different distances -- copying one number across both would
+# make the daily fields look permanently late or the 6-hourly currents look
+# permanently fresh.
+
+[products.cur-mercator]
+title = "Mercator Ocean currents"
+step = "mercator"
+roots = ["cur-mercator.json"]
+writes = ["cur-mercator*.json"]
+max_age_hours = 12
+namespace = ["python3", "scripts/fetch-mercator.py", "--namespace", "--only=cur-mercator"]
