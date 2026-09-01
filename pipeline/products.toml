@@ -53,7 +53,13 @@ lane = "copernicus"
 [products.cur-mercator]
 title = "Mercator Ocean currents"
 step = "mercator"
-roots = ["cur-mercator.json"]
+# One root per depth, each a list of two grids (u, v) -- the shape the
+# ESPC currents already publish. Named for the level that is actually
+# there, not for ESPC's nearest: -380m here is 380.21 m, and calling it
+# -350m so the two models' filenames matched would put "same word,
+# different water" into the contract. The fetcher re-checks them every run.
+roots = ["cur-mercator.json", "cur-mercator-47m.json", "cur-mercator-186m.json",
+         "cur-mercator-380m.json", "cur-mercator-1062m.json"]
 writes = ["cur-mercator*.json"]
 max_age_hours = 12
 namespace = ["python3", "scripts/fetch-mercator.py", "--namespace", "--only=cur-mercator"]
