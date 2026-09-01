@@ -56,10 +56,18 @@ docs" means across all ten repositories, is the doctrine block at the top of
 | depths | 50 levels, 0.49 m to 5727.92 m, priced individually |
 | toolbox install | 22 s |
 
-An ESPC-shaped set — five depths x two leads x (u,v) — would be 20 frames,
-about **672 MB and 12.5 minutes a build**. Whether that is the right shape is
-open: Mercator offers far more leads than ESPC's two, so the set count is a
-choice with a price on it rather than a copy. `PLAN.md` has the reasoning.
+**Every transfer figure above was measured through the toolbox's DEFAULT dask
+blocks, which read about 26x the bytes a level needs** (found 2026-09-01: 50.7 s
+a level that way, 1.9 s with `chunk_size_limit=0`, on the same store). They
+were true of a path the build no longer takes. The fetcher opens with no dask
+now and refuses a dask-backed array; the site's `PLAN.md` carries the
+measurement and the runner's own numbers are in the run logs, timestamped per
+line.
+
+An ESPC-shaped set — five depths x two leads x (u,v) — is 20 frames, about
+**672 MB**; the 12.5 minutes once quoted for it was the slow path's price.
+The set count is still a choice with a price on it rather than a copy.
+`PLAN.md` has the reasoning.
 
 ## Why a second model at all
 

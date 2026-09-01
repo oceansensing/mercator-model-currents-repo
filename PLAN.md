@@ -75,6 +75,14 @@ pipelines `pip install` already.
 | five depths against one | about 5x — **linear** |
 | toolbox install | 22 s |
 
+**Every transfer figure above was measured through the toolbox's DEFAULT dask
+blocks, which read about 26x the bytes a level needs** (found 2026-09-01: 50.7 s
+a level that way, 1.9 s with `chunk_size_limit=0`, on the same store). They
+were true of a path the build no longer takes. The fetcher opens with no dask
+now and refuses a dask-backed array; the site's `PLAN.md` carries the
+measurement and the runner's own numbers are in the run logs, timestamped per
+line.
+
 **Depths are priced individually**, which the `depth: 1` chunking predicts
 and the timing confirms: currents spent about 4 minutes on five levels
 against 36 s for one, temperature 65 s against 9 s. So a set costs what its
@@ -156,9 +164,10 @@ somebody else's tier.
 ## Open
 
 1. **The set count** — how many depths, how many leads. An ESPC-shaped set
-   (five depths x two leads x two components) is 20 frames, **672 MB and
-   about 12.5 minutes a build**. Mercator offers forecast to +9 days against
-   ESPC's two leads, so this is a choice with a price rather than a copy.
+   (five depths x two leads x two components) is 20 frames and **672 MB**;
+   *12.5 minutes a build* was its price on the slow path and is not its price
+   now. Mercator offers forecast to +9 days against ESPC's two leads, so this
+   is a choice with a price rather than a copy.
    **Do not size it from ESPC's 738.7 MB**: that number was measured against
    OPeNDAP, which charges for different things than Zarr does.
 2. **Published resolution and extent** — waiting on a byte measurement of the

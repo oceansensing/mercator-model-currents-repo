@@ -42,17 +42,18 @@ timeout_minutes = 30
 [steps.mercator]
 cmd = ["python3", "scripts/fetch-mercator.py", "--only=cur-mercator"]
 lane = "copernicus"
-# **75 minutes, because the caps changed what a full run costs and the first
-# one was killed at the 30 the defaults give.** A depth average needs the
-# COLUMN: a strided profile of about 17 levels per component per lead, against
-# the single level a point root needed. That is roughly 68 frames at the
-# measured 0.9 MB/s -- about 40 minutes -- where the point-level set took 12.
-#
-# Predicted before it happened and left unset anyway, which is why the number
-# is here with its arithmetic rather than as a bare 75. The job's own cap is
-# 100 minutes, so this leaves room for the tiles and the upload without
-# reaching it.
-timeout_minutes = 75
+# **Back to 30, with the arithmetic.** It was 75 because the caps read the
+# COLUMN -- about 68 frames at a measured 0.9 MB/s, 40 minutes -- and a run
+# still died at 100. Then the 0.9 MB/s turned out to be the price of the
+# toolbox's default dask blocks, which read about 26x the bytes a level needs
+# (site PLAN, 2026-09-01: 50.7 s a level that way, 1.9 s with no dask). The
+# fetcher opens with no dask now, keeps four reads in flight, and refuses a
+# dask-backed array outright -- so the slow path fails in seconds with a
+# sentence, not here with a timeout. 80 level reads at 0.6-1.9 s plus a
+# minute of writing predicts a 5-10 minute build; 30 is three times the
+# worst of that. If a run reaches it, the log now carries elapsed seconds on
+# every line and will say where the time went.
+timeout_minutes = 30
 
 # **Hours, and they are the upstream's rather than ours.** `max_age_hours`
 # measures the reader's distance from the newest published valid time.

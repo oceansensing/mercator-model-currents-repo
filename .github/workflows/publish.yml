@@ -28,7 +28,8 @@
 # Restore/Save pair in the same commit -- `plan` warns about a declared cache
 # nothing restores, and about a Restore step whose key no product declares.
 #
-# Cost of one run: the currents at five depths and two leads -- 20 frames, about 12 minutes.
+# Cost of one run: two levels and three depth averages at two leads -- 80 level reads,
+# predicted 5-10 minutes with no dask (the 12 minutes once quoted was the slow path).
 on:
   # **No `mode` input, because there is no longer a mode.** It offered
   # `full | light` and passed the choice straight to `orchestrate.py plan
@@ -50,7 +51,7 @@ on:
   schedule:
     # **On from 2026-09-01, and the probe is what made it affordable.**
     # Upstream moves 6-hourly, and until today every run paid the whole fetch
-    # -- 20 frames and about 12 minutes here -- because this fetcher had no probe-first exit. It has
+    # -- every frame, tens of minutes on the slow path -- because this fetcher had no probe-first exit. It has
     # one now: it reads the upstream's time axis, which is metadata and about
     # 5 s, and compares it against the `refTime` already on disk. A run with
     # nothing new costs that 5 s.
@@ -78,7 +79,10 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 100
+    # A backstop, not the guard: the fetch step's own 30 in products.toml is
+    # sized from the measurement, and the dask guard fails the known slow
+    # path in seconds. This covers install, checkout, tiles and upload on top.
+    timeout-minutes: 45
     permissions:
       contents: read
     outputs:
