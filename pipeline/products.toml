@@ -71,6 +71,10 @@ step = "mercator"
 # different quantity. A reader comparing the two models was comparing a single
 # level against a column mean, which is the whole thing the peer exists to
 # avoid. The `-avg` in the name is what says which.
+#
+# **And a cap covers the depth it names**: 0-200 means 200.000 m of water, not
+# whatever depth the strided profile happened to reach. It meant 270.301 m
+# until 2026-09-01, and the figure moved with the profile stride.
 roots = ["cur-mercator.json", "cur-mercator-47m.json", "cur-mercator-avg200m.json",
          "cur-mercator-avg350m.json", "cur-mercator-avg1000m.json"]
 writes = ["cur-mercator*.json"]

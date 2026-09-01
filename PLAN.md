@@ -177,3 +177,48 @@ Every number above has a run behind it, taken against the live service on
 `scripts/probe-mercator-chunks.py` in the site repository. The transfer rates
 are one sample each on a GitHub runner and will move with the day; the chunk
 shapes are properties of the store and will not.
+
+## 2026-09-01 — the caps reached the wrong depth, and the roots were shuffled
+
+Three defects, none of which reached this tree: the build that would have
+published them was cancelled on its timeout first. All three would have
+deployed cleanly, which is why they are written down.
+
+**The caps did not integrate to their own names.** A level was counted for its
+whole layer whenever its centre sat above the cap, so the integral ran to the
+midpoint below the deepest included level and divided by that. Measured on the
+real profile:
+
+| root | promises | covered, before | covered, now |
+| --- | --- | --- | --- |
+| `cur-mercator-avg200m` | 200 m | 270.301 m | **200.000 m** |
+| `cur-mercator-avg350m` | 350 m | 386.033 m | **350.000 m** |
+| `cur-mercator-avg1000m` | 1000 m | 902.339 m | **1000.000 m** |
+
+The 200 m cap was averaging 35% more water than its name claimed, and the
+figure **moved with `PROFILE_STRIDE`** — 189 m at stride 2, 211 m at stride 3
+— so a performance constant was silently redefining a published quantity. The
+deepest layer is clipped to the cap now, and the profile reads one level past
+the deepest cap (1062.44 m) so the 1000 m cap has a layer to clip rather than
+stopping at its last sample. Cost: one extra level read per component per lead.
+
+**Five point levels were planned against two point roots.** The product spec
+still named all five ESPC-like depths as point levels after the set was cut to
+two, so eight frames were planned against five declared roots and the write
+loop's `else roots[0]` fallback sent the three overflow frames to
+`cur-mercator.json` one after another. Published, that would have put the
+0–1000 m mean in the surface root and point velocities at 186/380/1062 m into
+the three `-avg*` roots — every currents root but `-47m` mislabeled. The tell
+was three consecutive writes of the same filename at 487, 479 and 471 KB in a
+build log.
+
+**Neither was visible to the suite.** The roots list was checked; the plan that
+fills it was not. Un-clipping the deepest layer left everything green. Both now
+have pins that separate the two arithmetics, each mutation-tested.
+
+**The depth axis is now known rather than assumed.** Printed off the live
+service by the site's `scripts/probe-mercator-chunks.py`: **50 levels**, 0.494
+to 5727.917 m. 22 of them sit in the top 100 m; only 36 are at or above
+1062 m, so a 0–1000 m cap never touches the abyssal 14. The stride comparison
+against full resolution is in the site's `PLAN.md` — stride 2 is kept, and a
+hand-picked 18-level set was measured worse at every cap.

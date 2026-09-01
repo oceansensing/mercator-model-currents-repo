@@ -4,13 +4,29 @@ Mercator ocean currents for the C4PO ocean map — **the horizontal currents fro
 
 **It publishes, since 2026-09-01.** `pipeline/products.toml` declares the
 products, the workflow builds them four times a day, and the site draws
-five current depths — 0, 47, 186, 380 and 1062 m under names that carry the model.
+**five current fields: two levels and three depth averages** —
 
-**The layer names carry the depth that is actually there**, not ESPC's
-nearest: 47 m against 50, 186 against 200, 380 against 350, 1062 against
-1000. Labelling them with ESPC's round numbers so the two lists lined up
-would say the layers are comparable at the same depth when 380 against 350 is
-9% deeper water.
+| root | what it is |
+| --- | --- |
+| `cur-mercator.json` | the current AT 0.49 m |
+| `cur-mercator-47m.json` | the current AT 47.37 m |
+| `cur-mercator-avg200m.json` | the **mean** over 0–200 m |
+| `cur-mercator-avg350m.json` | the **mean** over 0–350 m |
+| `cur-mercator-avg1000m.json` | the **mean** over 0–1000 m |
+
+**A level says its own depth; a cap says `-avg` and a round number.** The two
+are different quantities and the names have to make that unmissable: a
+velocity at 186 m is not a 0–200 m mean, and publishing the first under the
+second's name is the mistake this set exists to avoid. So a level is labelled
+with the depth that is actually there — 47 m, not ESPC's 50 — while a cap is
+labelled with the depth it integrates **to**.
+
+**And it does reach that depth.** The caps are thickness-weighted means,
+clipped to the cap: each covers exactly 200.000, 350.000 and 1000.000 m. Until
+2026-09-01 they did not — `-avg200m` was a mean over 0–270.301 m, and the
+covered depth moved with the profile stride — which is recorded in `PLAN.md`
+because a name containing a number needs something checking that the
+arithmetic reaches it.
 
 `PLAN.md` carries the measurements and what is open. `DECISIONS.md` indexes
 the dated one-way decisions. **Which document gets what, and what "update
