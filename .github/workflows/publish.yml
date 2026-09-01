@@ -35,27 +35,29 @@ on:
   # --mode`, which has accepted only `full` since the light path was retired
   # on 2026-08-27 — so dispatching `light` would fail the run outright.
   workflow_dispatch:
-  # **Held OFF until a first dispatched run is green.** The siblings each
+  # **Was held off until a dispatched run was green and the fetcher had a
+  # probe.** Both are true as of 2026-09-01. The siblings each
   # learned this: a cron firing before `PIPELINES_SSH_KEY` can read the
   # private site repository spins runners to fail at the same step, and a
   # publish tree that has never been built once has nothing for the stage to
   # be seeded from. The deploy key went on 2026-08-31; turn the schedule on
   # after a dispatched run publishes a tree, not before.
-  # schedule:
-    # **Upstream moves 6-hourly, so this must not be hourly.** Mercator's
-    # currents are 6-hourly and its scalars daily; an hourly cron would spend
-    # most runs discovering nothing had changed. What the right cadence is
-    # has not been measured against the service's own update time, which is
-    # one reason nothing is enabled yet.
+  schedule:
+    # **On from 2026-09-01, and the probe is what made it affordable.**
+    # Upstream moves 6-hourly, and until today every run paid the whole fetch
+    # -- 20 frames and about 12 minutes here -- because this fetcher had no probe-first exit. It has
+    # one now: it reads the upstream's time axis, which is metadata and about
+    # 5 s, and compares it against the `refTime` already on disk. A run with
+    # nothing new costs that 5 s.
     #
-    # **The other reason: this fetcher has no probe-first exit.** The sibling
-    # fetchers compare a published hour against the upstream's before
-    # spending anything; this one does not, so every run pays the full fetch.
-    # Affordable at three frames, not at twenty, and it is the first thing to
-    # add before the currents go on a schedule.
-    # Commented until a dispatched run publishes a tree — see the header.
-    # Uncomment in the same sitting that confirms the first green run.
-    # - cron: '41 3,11,19 * * *'
+    # It also rebuilds when THIS SCRIPT would publish something the disk does
+    # not have -- a root added, a depth split out -- because a probe watching
+    # only the upstream cannot see a change in us.
+    #
+    # Four a day: enough to pick up a new run within a few hours, few enough
+    # that the probe is not the whole point of the exercise. The minute is
+    # offset from every sibling's so no two pipelines read upstream together.
+    - cron: '13 1,7,13,19 * * *'
 
 # Nothing at workflow level: each job says what it holds, and the job that
 # runs `pip install` and the fetchers holds nothing worth stealing.

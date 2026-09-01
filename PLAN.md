@@ -5,12 +5,31 @@ records what was measured before anything was built, and what is still open.
 
 ## Where it stands
 
-Created 2026-09-01 with its four documents and its credentials, and nothing
-else. The deploy key that lets a pipeline here read the private site
+**It publishes, since 2026-09-01.** `pipeline/products.toml` declares the
+products, the workflow builds them, and the schedule is on at
+`13 1,7,13,19` -- four runs a day.
+
+The fetch path is `scripts/fetch-mercator.py` in the site repository, and it
+was validated against the live service before any of this was switched on:
+a scalar frame came back at 360x171, 1.0 deg, -2.093 to 35.76 degrees C, and a
+currents frame at +/-1.75 m/s with wet counts falling and speeds weakening
+with depth. Numbers that would not survive a transform fault.
+
+**The probe is what makes a schedule affordable.** A full run here is
+20 frames, about 12 minutes; the probe reads the upstream's time axis -- metadata, about 5 s --
+and compares it against the `refTime` on disk, so a run with nothing new costs
+seconds. It also rebuilds when this script would publish something the disk
+does not have, because a probe watching only the upstream cannot see a change
+in us.
+
+Created 2026-09-01 with its four documents and its credentials. The deploy key that lets a pipeline here read the private site
 repository is on that repository as `mercator-model-currents-repo-checkout`,
 read-only; the Copernicus pair and `PIPELINES_SSH_KEY` are secrets here.
 
-**Open, and blocking the build: the set count.** See below.
+**The set count was decided and is no longer blocking**: five depths matching
+ESPC's as closely as this grid allows, and two leads -- parity with ESPC
+rather than the +9 days on offer. A starting shape, not a ceiling: leads are
+the cheap axis to grow and depth is not.
 
 ## Why a second model, and why this one
 
