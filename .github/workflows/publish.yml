@@ -28,8 +28,9 @@
 # Restore/Save pair in the same commit -- `plan` warns about a declared cache
 # nothing restores, and about a Restore step whose key no product declares.
 #
-# Cost of one run: two levels and three depth averages at two leads -- 80 level reads,
-# predicted 5-10 minutes with no dask (the 12 minutes once quoted was the slow path).
+# Cost of one run: two levels and three depth averages at two leads, the full
+# 36-level profile -- 144 level reads. Measured 2026-09-01: 80 reads and every
+# root written in 102 s (the 12 minutes once quoted was the slow path).
 on:
   # **No `mode` input, because there is no longer a mode.** It offered
   # `full | light` and passed the choice straight to `orchestrate.py plan

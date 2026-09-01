@@ -225,6 +225,29 @@ build log.
 fills it was not. Un-clipping the deepest layer left everything green. Both now
 have pins that separate the two arithmetics, each mutation-tested.
 
+**The build that followed took 102 seconds.** Run 33551023284, 2026-09-01
+19:57Z, on a 4-cpu 16 GB runner, after the site's fetcher stopped opening
+the store through the toolbox's default dask blocks (which read about 26x the
+bytes a level needs -- the site's `PLAN.md` has the measurement): lead 0's
+forty level reads done at 32.6 s, lead 6's at 80.1 s, all ten roots and
+their tiles written at 102.4 s. About 0.65 s a level with four reads in
+flight. The two stale +24h roots were retired on that pass and no tiles-only
+pass fired. The prediction had said five to ten minutes; it was wrong on the
+safe side by two to three times.
+
+**And that run did not deploy.** It was the first time a cap root reached
+the consumer contract, and the contract held it: the header said `depthTo`,
+a field nothing reads, where the contract requires `depthAveraged: [0, N]`
+-- the field ESPC writes and the map labels from. Fixed in the fetcher with a
+self-test that runs the real checker; the site's `PLAN.md` has the record.
+The published branch took the caps anyway (that upload is unconditional), so
+for an hour this branch was a run ahead of the site.
+
+**The profile stride is 1 from here.** At 0.65 s a level the full 36-level
+profile to 1062 m is about 40 s more a build than every-other-level, and
+removes the sampling question rather than answering it: the caps are means
+over the model's own layering.
+
 **The depth axis is now known rather than assumed.** Printed off the live
 service by the site's `scripts/probe-mercator-chunks.py`: **50 levels**, 0.494
 to 5727.917 m. 22 of them sit in the top 100 m; only 36 are at or above

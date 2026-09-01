@@ -21,8 +21,9 @@ second's name is the mistake this set exists to avoid. So a level is labelled
 with the depth that is actually there — 47 m, not ESPC's 50 — while a cap is
 labelled with the depth it integrates **to**.
 
-**And it does reach that depth.** The caps are thickness-weighted means,
-clipped to the cap: each covers exactly 200.000, 350.000 and 1000.000 m. Until
+**And it does reach that depth.** The caps are thickness-weighted means over
+**every model level** to the cap, clipped to it: each covers exactly 200.000,
+350.000 and 1000.000 m, with no sampling stride between the levels. Until
 2026-09-01 they did not — `-avg200m` was a mean over 0–270.301 m, and the
 covered depth moved with the profile stride — which is recorded in `PLAN.md`
 because a name containing a number needs something checking that the
@@ -55,6 +56,8 @@ docs" means across all ten repositories, is the doctrine block at the top of
 | scalar transfer | 3.6 MB/s (9 s a frame) |
 | depths | 50 levels, 0.49 m to 5727.92 m, priced individually |
 | toolbox install | 22 s |
+| **fetch step, no dask, four reads in flight** | **102 s** for 80 level reads and ten roots with tiles (run 33551023284, 4-cpu runner) |
+| one level, that way | about **0.65 s** |
 
 **Every transfer figure above was measured through the toolbox's DEFAULT dask
 blocks, which read about 26x the bytes a level needs** (found 2026-09-01: 50.7 s

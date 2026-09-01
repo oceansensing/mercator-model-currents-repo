@@ -49,10 +49,12 @@ lane = "copernicus"
 # (site PLAN, 2026-09-01: 50.7 s a level that way, 1.9 s with no dask). The
 # fetcher opens with no dask now, keeps four reads in flight, and refuses a
 # dask-backed array outright -- so the slow path fails in seconds with a
-# sentence, not here with a timeout. 80 level reads at 0.6-1.9 s plus a
-# minute of writing predicts a 5-10 minute build; 30 is three times the
-# worst of that. If a run reaches it, the log now carries elapsed seconds on
-# every line and will say where the time went.
+# sentence, not here with a timeout. Measured 2026-09-01 (run 33551023284):
+# 80 level reads and all ten roots in 102 s on a 4-cpu runner, about 0.65 s a
+# level. The profile is every level to 1062 m now -- 144 reads, predicted
+# about 2.5 minutes -- so 30 is a backstop ten times the expected, not a
+# budget. If a run reaches it, the log carries elapsed seconds on every line
+# and will say where the time went.
 timeout_minutes = 30
 
 # **Hours, and they are the upstream's rather than ours.** `max_age_hours`
