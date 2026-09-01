@@ -42,6 +42,17 @@ timeout_minutes = 30
 [steps.mercator]
 cmd = ["python3", "scripts/fetch-mercator.py", "--only=cur-mercator"]
 lane = "copernicus"
+# **75 minutes, because the caps changed what a full run costs and the first
+# one was killed at the 30 the defaults give.** A depth average needs the
+# COLUMN: a strided profile of about 17 levels per component per lead, against
+# the single level a point root needed. That is roughly 68 frames at the
+# measured 0.9 MB/s -- about 40 minutes -- where the point-level set took 12.
+#
+# Predicted before it happened and left unset anyway, which is why the number
+# is here with its arithmetic rather than as a bare 75. The job's own cap is
+# 100 minutes, so this leaves room for the tiles and the upload without
+# reaching it.
+timeout_minutes = 75
 
 # **Hours, and they are the upstream's rather than ours.** `max_age_hours`
 # measures the reader's distance from the newest published valid time.
