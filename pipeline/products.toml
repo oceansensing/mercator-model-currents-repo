@@ -51,9 +51,9 @@ lane = "copernicus"
 # dask-backed array outright -- so the slow path fails in seconds with a
 # sentence, not here with a timeout. Measured 2026-09-01 (run 33551023284):
 # 80 level reads and all ten roots in 102 s on a 4-cpu runner, about 0.65 s a
-# level. The profile is every level to 1062 m now -- 144 reads, predicted
-# about 2.5 minutes -- so 30 is a backstop ten times the expected, not a
-# budget. If a run reaches it, the log carries elapsed seconds on every line
+# level. The profile is every level to 1062 m now -- 144 reads, measured
+# 121 s for the whole step (run 33556402912) -- so 30 is a backstop fifteen
+# times the expected, not a budget. If a run reaches it, the log carries elapsed seconds on every line
 # and will say where the time went.
 timeout_minutes = 30
 

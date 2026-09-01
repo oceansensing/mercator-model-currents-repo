@@ -246,7 +246,16 @@ for an hour this branch was a run ahead of the site.
 **The profile stride is 1 from here.** At 0.65 s a level the full 36-level
 profile to 1062 m is about 40 s more a build than every-other-level, and
 removes the sampling question rather than answering it: the caps are means
-over the model's own layering.
+over the model's own layering. Measured on the first such run (33556402912,
+2026-09-01 20:38Z): 144 reads and every root and tile in **121 s**, a
+3.5-minute job, and it deployed -- the live site served the caps forty
+seconds later.
+
+**Open: the tile cache never saves.** `Save cur tiles` is skipped every run
+because the tiers are written by the fetch pass and the orchestrator marks
+a cache built only from its own tiles-only step. Harmless here -- a tier is
+a slice of a frame the fetch holds anyway -- but the Restore/Save pair is
+inert and its comment describes a mechanism that does not run.
 
 **The depth axis is now known rather than assumed.** Printed off the live
 service by the site's `scripts/probe-mercator-chunks.py`: **50 levels**, 0.494

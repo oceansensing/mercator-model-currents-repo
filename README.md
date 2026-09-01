@@ -58,6 +58,7 @@ docs" means across all ten repositories, is the doctrine block at the top of
 | toolbox install | 22 s |
 | **fetch step, no dask, four reads in flight** | **102 s** for 80 level reads and ten roots with tiles (run 33551023284, 4-cpu runner) |
 | one level, that way | about **0.65 s** |
+| **the full 36-level profile**, both leads, ten roots with tiles | **121 s** (run 33556402912, 3.5-minute job) |
 
 **Every transfer figure above was measured through the toolbox's DEFAULT dask
 blocks, which read about 26x the bytes a level needs** (found 2026-09-01: 50.7 s
