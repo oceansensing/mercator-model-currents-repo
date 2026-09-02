@@ -62,6 +62,14 @@ not ESPC's 350. Naming it `-350m` so the two models' filenames lined up would
 have written "same word, different water" into the contract itself, and the
 map's layer names follow the roots for the same reason.
 
+*Amended 2026-09-01, the same day.* The **three deepest point depths became
+depth AVERAGES** before the set ever published: `-186m`, `-380m` and `-1062m`
+were point levels where ESPC publishes 0-200, 0-350 and 0-1000 m means, so
+they became `-avg200m`, `-avg350m` and `-avg1000m` -- a mean over the column
+to the depth in the name, not a reading at it. Two point levels remain, 0.49
+and 47.37 m. The naming rule stands and gained an instance the same evening:
+`temp29-mercator` carries the model's 29.445 m, not ESPC's 30.
+
 One-way in the first sense this file names: resolution, depth and lead are the
 shape readers code against. Dropping a depth strands anything built on it, and
 renaming one silently changes which water a filename promises.
