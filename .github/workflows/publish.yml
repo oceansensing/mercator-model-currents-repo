@@ -9,7 +9,7 @@
 #
 # **This file is `sentinel3-data-repo`'s with four changes**, kept close so
 # the two can be diffed: the Copernicus credentials on the fetch step, a
-# different dependency pin, no tile cache, and this header.
+# different dependency pin, its own tile cache pair, and this header.
 #
 # **What is genuinely different: the credentials, and where they are.** The
 # fetcher talks to Copernicus Marine, which takes a username and password --
@@ -23,8 +23,10 @@
 # anything email-shaped out of everything it prints, and a self-test holds it
 # there. Do not add a step that echoes the environment.
 #
-# **No tile cache pair**, and that is not an omission: this product publishes
-# a decimated global grid and no tile tier yet. Adding one means adding its
+# **One Restore/Save pair, `mercator-cur-tiles`**, for the native 1/12-degree
+# tiers -- and Save is skipped every run, because the tiers are written by the
+# fetch pass and the orchestrator marks a cache built only from its own
+# tiles-only step (open, see PLAN). Adding a cache means adding its
 # Restore/Save pair in the same commit -- `plan` warns about a declared cache
 # nothing restores, and about a Restore step whose key no product declares.
 #

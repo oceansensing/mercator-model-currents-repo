@@ -76,8 +76,7 @@ renaming one silently changes which water a filename promises.
 
 ## Open, and not decided here
 
-The **set count** — how many depths and how many leads. Mercator's currents
-are 6-hourly with forecast to +9 days, against ESPC's two leads, so this is a
-choice with a price on it rather than a copy, and `PLAN.md` carries the
-measurement it will be made from. Also open: the published resolution and
-extent, and whether the two halves share a cadence.
+Whether the two halves share a cadence: currents are 6-hourly and scalars
+daily upstream. *(The set count, the published resolution and the extent were
+decided by D3 and its 2026-09-01 amendment; more leads is a `PLAN.md` item,
+not a door.)*

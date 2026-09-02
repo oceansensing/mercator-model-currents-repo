@@ -68,10 +68,10 @@ now and refuses a dask-backed array; the site's `PLAN.md` carries the
 measurement and the runner's own numbers are in the run logs, timestamped per
 line.
 
-An ESPC-shaped set — five depths x two leads x (u,v) — is 20 frames, about
-**672 MB**; the 12.5 minutes once quoted for it was the slow path's price.
-The set count is still a choice with a price on it rather than a copy.
-`PLAN.md` has the reasoning.
+A build is 144 level reads at two leads, 121 s on a 4-cpu runner
+(run 33556402912); the "20 frames, 672 MB, 12.5 minutes" once quoted here
+priced a five-point-depth set on the slow path and describes neither the set
+nor the path now. `PLAN.md` has the reasoning.
 
 ## Why a second model at all
 

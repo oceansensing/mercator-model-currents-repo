@@ -159,11 +159,15 @@ announces which account it logged in as, so anything running here writes that
 into a public log unless it masks it. Mask the username and any email-shaped
 string, and gate it rather than remember it.
 
-**The depths are not ESPC's depths.** Against ESPC's 0, 50, 200, 350 and
-1000 m, the nearest Mercator levels are 0.49, 47.37, 186.13, 380.21 and
-1062.44 m. Close enough to compare, far enough that 380 against 350 is 9%
-deeper — a reader must be told rather than left to assume the labels mean the
-same water.
+**The depths are not ESPC's depths, and the deep ones are not depths at all.**
+Two point levels publish — 0.49 and 47.37 m against ESPC's 0 and 50 — and
+the three deep roots are thickness-weighted MEANS over every model level to
+200, 350 and 1000 m, clipped exactly to the cap, exactly the quantity ESPC's
+caps are. The names carry the model's own level (`-47m`, `temp29`) rather
+than ESPC's round number, because a reader must be told rather than left to
+assume the labels mean the same water; the point levels 186.13, 380.21 and
+1062.44 m that stood here until 2026-09-01 were the wrong quantity beside a
+column mean and are gone (D3, amended).
 
 **Do not pin the trailing dataset version.** Copernicus versions ids with a
 date suffix (`_202406`) and retires them on a schedule, so a hardcoded one
