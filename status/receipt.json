@@ -1,0 +1,16 @@
+{
+ "schema": 1,
+ "generated": "2026-09-05T19:19:20Z",
+ "mode": "full",
+ "fates": {
+  "cur-mercator": "fresh"
+ },
+ "reasons": {},
+ "built": {},
+ "withheld": {
+  "cur-mercator": {}
+ },
+ "deploy": true,
+ "notes": [],
+ "behind": []
+}
