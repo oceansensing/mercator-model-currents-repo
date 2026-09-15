@@ -1,0 +1,36 @@
+{
+ "schema": 2,
+ "generated": "2026-09-15T19:22:25Z",
+ "mode": "full",
+ "run": {
+  "id": "35012944629",
+  "url": "https://github.com/oceansensing/mercator-model-currents-repo/actions/runs/35012944629"
+ },
+ "products": {
+  "cur-mercator": {
+   "title": "Mercator Ocean currents",
+   "roots": [
+    "cur-mercator.json",
+    "cur-mercator-47m.json",
+    "cur-mercator-avg200m.json",
+    "cur-mercator-avg350m.json",
+    "cur-mercator-avg1000m.json"
+   ],
+   "fate": "fresh",
+   "reason": null,
+   "checked": "2026-09-15T19:22:25Z",
+   "updated": "2026-09-15T19:22:25Z",
+   "hour": "2026-09-15T18:00:00Z",
+   "modelRun": null,
+   "source": "Mercator Ocean / Copernicus Marine",
+   "hours": [
+    "2026-09-15T18:00:00Z",
+    "2026-09-16T00:00:00Z"
+   ],
+   "stale": false,
+   "staleCause": null,
+   "ageHours": 1.37,
+   "nearestOffsetHours": 1.37
+  }
+ }
+}
