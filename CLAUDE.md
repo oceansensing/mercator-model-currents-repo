@@ -179,3 +179,15 @@ ages; the toolbox warns about it and prefers `dataset_version`.
 - `CLAUDE.md` — this file: what must not be got wrong
 - `PLAN.md` — what happened, measured, and what is open
 - `DECISIONS.md` — which one-way door closed, and when
+
+## The R2 publish (2026-09-24)
+
+This workflow publishes twice from one build: to GitHub Pages, and to
+Cloudflare R2 under `oceannow-data/<this repository>/` through the
+`publish-r2` job (ocean-now's D24). **R2 stands on its own** — the owner,
+2026-09-24: *"When operational R2 server should be able to function on its
+own without GitHub. Cross check with GitHub is a feature but not
+requirement"* — so the job needs only `build` and its publish decision, and
+neither side's failure stops the other. The script, its rules and its tests
+are `realtime-data-repo`'s `pipeline/publish_r2.py`; the credentials are the
+`oceansensing` organization's `R2_*` secrets.
