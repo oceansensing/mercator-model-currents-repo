@@ -10,8 +10,9 @@ must not be got wrong here.
 ## Where truth lives, and what "update docs" means
 
 Ten repositories carry this project. The engine and the site:
-`oceanlet.js`, `oceansensing.github.io` (the site, and every fetch script).
-The orchestrator and the observations: `realtime-data-repo`. And the data
+`oceanlet.js`, `oceansensing.github.io` (the site, every fetch script, and
+since 2026-09-26 the pipeline's code, `pipeline/`). The observations:
+`realtime-data-repo`. And the data
 repositories, which since 2026-08-30 split **currents from fields** per model:
 `espc-model-repo` (the ESPC currents — a legacy name, see below),
 `espc-model-fields-repo`, `eccofs-model-currents-repo`,
