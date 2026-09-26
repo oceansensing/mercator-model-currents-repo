@@ -190,5 +190,6 @@ Cloudflare R2 under `oceannow-data/<this repository>/` through the
 own without GitHub. Cross check with GitHub is a feature but not
 requirement"* — so the job needs only `build` and its publish decision, and
 neither side's failure stops the other. The script, its rules and its tests
-are `realtime-data-repo`'s `pipeline/publish_r2.py`; the credentials are the
+are the site's `pipeline/publish_r2.py` (private; in
+`realtime-data-repo` until 2026-09-26); the credentials are the
 `oceansensing` organization's `R2_*` secrets.
