@@ -35,7 +35,7 @@ docs" means across all ten repositories, is the doctrine block at the top of
 `CLAUDE.md`** — the same text in all ten, held equal by the site's
 `check:docs`.
 
-## What it will publish
+## What it publishes
 
 | | |
 | --- | --- |
@@ -46,6 +46,11 @@ docs" means across all ten repositories, is the doctrine block at the top of
 | resolution | **0.083 deg (1/12 deg)**, 2041 x 4320 global |
 | cadence | 6-hourly, with forecast to +9 days |
 | access | the `copernicusmarine` toolbox over Zarr; account required |
+
+The tree goes to GitHub Pages at
+<https://oceansensing.org/mercator-model-currents-repo/>. The same tree also
+goes to Cloudflare R2 (`oceannow-data/mercator-model-currents-repo/`), which
+the Ocean Now app reads; the site's `pipeline/publish_r2.py` has the rules.
 
 ## What one frame costs, measured 2026-09-01
 
