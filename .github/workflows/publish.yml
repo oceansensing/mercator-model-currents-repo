@@ -153,15 +153,11 @@ jobs:
           echo "::error title=If the log says only 'Permission denied (publickey)'::The key parsed but the server would not take it. The public half is missing from the site repository's Deploy keys page, or was revoked, or does not match this private half."
           echo "::error title=If the log says 'Repository not found'::No credential was used at all - the secret is unset or empty, so actions/checkout fell back to this workflow's GITHUB_TOKEN, which holds no grant on the site repository."
 
-      # The orchestrator. Public, so no credential — and deliberately not a
-      # copy: `PIPELINE_ROOT` below is what lets it operate on this tree while
-      # living in that one.
-      - name: Check out the engine
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          repository: oceansensing/realtime-data-repo
-          ref: main
-          path: engine
+      # **The orchestrator is in the site checkout above** (`site/pipeline/`),
+      # since 2026-09-26: the pipeline's code moved from the public
+      # realtime-data-repo to the private site repository, which this run
+      # already reads with its deploy key. `PIPELINE_ROOT` below is what lets
+      # it operate on this tree while living in that one.
 
       # The last publish — the seed, the previous manifests, and the whole of
       # what a held product falls back to. Tolerated missing exactly once:
@@ -183,8 +179,8 @@ jobs:
           node-version: '22'
 
       # A broken orchestrator refuses to run rather than publishing something
-      # strange with green ticks. Run from the engine's own checkout, where
-      # its fixtures live.
+      # strange with green ticks. Run from the site's checkout, where the
+      # pipeline's code and its tests live.
       # **What the fetcher needs, and why one line covers it.**
       # `copernicusmarine` is the only route in: Copernicus retired OPeNDAP,
       # ERDDAP, MOTU, FTP and WMS in April 2024, so there is nothing the
@@ -196,7 +192,7 @@ jobs:
         run: pip install --no-cache-dir 'copernicusmarine==2.4.1'
 
       - name: Unit-test the orchestrator
-        working-directory: engine
+        working-directory: site
         run: python3 pipeline/test_orchestrate.py
 
       # The fetcher's own checks, run before it is allowed near a publish.
@@ -210,7 +206,7 @@ jobs:
       - name: Seed the stage from the last publish
         env:
           PIPELINE_ROOT: ${{ github.workspace }}
-        run: python3 engine/pipeline/orchestrate.py seed
+        run: python3 site/pipeline/orchestrate.py seed
 
       - name: Plan the run
         id: plan
@@ -224,7 +220,7 @@ jobs:
           # tiles, not the credentials, which is what makes it worth a comment.
           COPERNICUSMARINE_SERVICE_USERNAME: ${{ secrets.COPERNICUSMARINE_SERVICE_USERNAME }}
           COPERNICUSMARINE_SERVICE_PASSWORD: ${{ secrets.COPERNICUSMARINE_SERVICE_PASSWORD }}
-        run: python3 engine/pipeline/orchestrate.py plan --mode full
+        run: python3 site/pipeline/orchestrate.py plan --mode full
 
       # **One Restore and one Save per `cache` name in products.toml.** Nothing
       # loops here, because a matrix would need separate jobs — so this pair
@@ -262,7 +258,7 @@ jobs:
           MERCATOR_FORCE: ${{ inputs.force }}
           COPERNICUSMARINE_SERVICE_USERNAME: ${{ secrets.COPERNICUSMARINE_SERVICE_USERNAME }}
           COPERNICUSMARINE_SERVICE_PASSWORD: ${{ secrets.COPERNICUSMARINE_SERVICE_PASSWORD }}
-        run: python3 engine/pipeline/orchestrate.py run
+        run: python3 site/pipeline/orchestrate.py run
 
 
       - name: Save cur tiles
@@ -334,7 +330,7 @@ jobs:
   # the build and its publish decision, so a Pages outage never stops it and
   # a failure here never touches Pages. Only what changed is uploaded, and
   # the bucket is then compared file by file with what the run built.
-  # `pipeline/publish_r2.py` in realtime-data-repo has the rules.
+  # `pipeline/publish_r2.py` in oceansensing.github.io has the rules.
   publish-r2:
     needs: build
     if: needs.build.outputs.deploy == 'true'
@@ -346,9 +342,10 @@ jobs:
       - name: Check out the publish script
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          repository: oceansensing/realtime-data-repo
-          path: engine
+          repository: oceansensing/oceansensing.github.io
+          path: code
           sparse-checkout: pipeline
+          ssh-key: ${{ secrets.PIPELINES_SSH_KEY }}
 
       - name: Download the built site
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
@@ -357,7 +354,7 @@ jobs:
           path: pages
 
       - name: Test the publish script
-        run: python3 engine/pipeline/test_publish_r2.py
+        run: python3 code/pipeline/test_publish_r2.py
 
       - name: Publish to R2
         env:
@@ -371,4 +368,4 @@ jobs:
         run: |
           mkdir site
           tar -xf pages/artifact.tar -C site
-          python3 engine/pipeline/publish_r2.py site "$GITHUB_REPOSITORY"
+          python3 code/pipeline/publish_r2.py site "$GITHUB_REPOSITORY"
