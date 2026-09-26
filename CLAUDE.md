@@ -185,8 +185,8 @@ ages; the toolbox warns about it and prefers `dataset_version`.
 ## The R2 publish (2026-09-24)
 
 This workflow publishes twice from one build: to GitHub Pages, and to
-Cloudflare R2 under `oceannow-data/<this repository>/` through the
-`publish-r2` job (ocean-now's D24). **R2 stands on its own** — the owner,
+Cloudflare R2, under this repository's name, through the
+`publish-r2` job. **R2 stands on its own** — the owner,
 2026-09-24: *"When operational R2 server should be able to function on its
 own without GitHub. Cross check with GitHub is a feature but not
 requirement"* — so the job needs only `build` and its publish decision, and
