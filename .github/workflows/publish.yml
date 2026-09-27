@@ -189,7 +189,7 @@ jobs:
       # under the fetcher would publish numbers rather than an error. It
       # installs in 22 s, measured.
       - name: Install what the fetcher needs
-        run: pip install --no-cache-dir 'copernicusmarine==2.4.1'
+        run: pip install --no-cache-dir -r site/scripts/requirements-mercator.txt
 
       - name: Unit-test the orchestrator
         working-directory: site
