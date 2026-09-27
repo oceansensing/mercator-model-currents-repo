@@ -139,7 +139,11 @@ added after ESPC: `<model>-model-currents-repo` and
 `<model>-model-fields-repo`. The axis that costs bytes is vectors against
 scalars — ESPC's currents are 738.7 MB of tiles against 169.5 MB of fields —
 so the two halves have different storage budgets and different failure modes,
-and sharing a publish gate would let one hold back the other.
+and sharing a publish gate would let one hold back the other. **Since
+2026-09-27 there is a third, `mercator-model-bgc-repo`**: the global
+biogeochemistry, surface fields at 0.25 degree from the site's
+`fetch-mercator-bgc.py`, published but not drawn — its own repository for
+the same reason, and carrying its own copy of the Copernicus secrets.
 
 **The upstream is Zarr behind a toolbox, not OPeNDAP, and none of the ESPC
 fetch code carries over.** Copernicus retired OPeNDAP, ERDDAP, MOTU, FTP and
