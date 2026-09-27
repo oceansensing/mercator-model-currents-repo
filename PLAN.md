@@ -258,3 +258,12 @@ to 5727.917 m. 22 of them sit in the top 100 m; only 36 are at or above
 against full resolution is in the site's `PLAN.md` — stride 1 is what
 publishes, 36 levels to 1062 m, and a hand-picked 18-level set was measured
 worse than stride 2 at every cap.
+
+## The workflow's packages come from the site — 2026-09-27
+
+The publish workflow installs `site/scripts/requirements-mercator.txt`, one file
+per fetcher family, instead of naming packages in its own `pip install`
+line. Dependabot reads requirements files and never a workflow line: an
+inline pin elsewhere had carried `requests` 2.32.3, a version with two
+advisories, unflagged. The site's `check:docs` now refuses an inline package
+here. Confirmed by a dispatched run, green on build, Pages and R2.
