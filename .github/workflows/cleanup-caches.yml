@@ -1,0 +1,49 @@
+name: Clean up caches
+
+# **Each run's caches are keyed to the model run they hold**, so once a newer
+# run arrives an older cache is never restored again, and nothing deleted
+# them: by 2026-10-04 the heaviest of these repositories held 183 caches,
+# 10.8 GB, past GitHub's 10 GB per repository. GitHub drops a cache unused
+# for seven days and, over the limit, the least recently used first; this
+# sweep keeps the total near what the current runs use.
+#
+# Daily, deleting every cache not restored or saved in the last two days.
+# The publish runs here come every few hours, so a cache they still use is
+# never that old. A missed day only waits for the next.
+
+on:
+  schedule:
+    - cron: '29 10 * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: cleanup-caches
+  cancel-in-progress: false
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      actions: write
+    steps:
+      - name: Delete caches unused for two days
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          cutoff=$(date -u -d '2 days ago' +%s)
+          deleted=0 freed=0 kept=0
+          while read -r id used size; do
+            if [ "$(date -u -d "$used" +%s)" -lt "$cutoff" ]; then
+              gh api -X DELETE "repos/$REPO/actions/caches/$id" > /dev/null
+              deleted=$((deleted + 1)) freed=$((freed + size))
+            else
+              kept=$((kept + 1))
+            fi
+          done < <(gh api --paginate "repos/$REPO/actions/caches?per_page=100" \
+                     -q '.actions_caches[] | "\(.id) \(.last_accessed_at) \(.size_in_bytes)"')
+          echo "deleted $deleted caches, $((freed / 1000000)) MB; kept $kept"
