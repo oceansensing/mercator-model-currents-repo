@@ -57,6 +57,15 @@ lane = "copernicus"
 # and will say where the time went.
 timeout_minutes = 30
 
+# **The daily-mean levels, a step of their own on the same lane** (2026-10-10):
+# 72 level reads and 36 roots with their tiles, measured 2026-10-10 on a
+# 16-core Mac at about three seconds a level; the backstop is several times a
+# 4-core runner's expected.
+[steps.mercator-levels]
+cmd = ["python3", "scripts/fetch-mercator.py", "--only=uv-mercator"]
+lane = "copernicus"
+timeout_minutes = 45
+
 # **Hours, and they are the upstream's rather than ours.** `max_age_hours`
 # measures the reader's distance from the newest published valid time.
 # Mercator's currents are 6-hourly and its scalars daily, so the two halves
@@ -115,4 +124,34 @@ match = [
   ["tiles-cur-mercator-avg1000m-f*h", "cur-mercator-avg1000m-f*h.json"],
   ["tiles-cur-mercator-bottom", "cur-mercator-bottom.json"],
   ["tiles-cur-mercator-bottom-f*h", "cur-mercator-bottom-f*h.json"],
+]
+
+# **Every level the depth means read, as daily means, R2's alone** (2026-10-10;
+# the site's `scripts/fetch-mercator.py`, LEVELS_KEPT): the 36 levels from 0.494
+# to 1062.440 m, one root a level named for its depth to the meter, read once a
+# day from the variable's daily-mean dataset in a step of its own, so the
+# six-hourly products above never wait on it.
+[products.uv-mercator]
+title = "Mercator Ocean currents at each level to 1062 m, daily means"
+step = "mercator-levels"
+roots = ["uv-mercator-0m.json", "uv-mercator-2m.json", "uv-mercator-3m.json", "uv-mercator-4m.json",
+         "uv-mercator-5m.json", "uv-mercator-6m.json", "uv-mercator-8m.json", "uv-mercator-10m.json",
+         "uv-mercator-11m.json", "uv-mercator-13m.json", "uv-mercator-16m.json", "uv-mercator-18m.json",
+         "uv-mercator-22m.json", "uv-mercator-25m.json", "uv-mercator-29m.json", "uv-mercator-34m.json",
+         "uv-mercator-40m.json", "uv-mercator-47m.json", "uv-mercator-56m.json", "uv-mercator-66m.json",
+         "uv-mercator-78m.json", "uv-mercator-92m.json", "uv-mercator-110m.json", "uv-mercator-131m.json",
+         "uv-mercator-156m.json", "uv-mercator-186m.json", "uv-mercator-222m.json", "uv-mercator-266m.json",
+         "uv-mercator-318m.json", "uv-mercator-380m.json", "uv-mercator-454m.json", "uv-mercator-541m.json",
+         "uv-mercator-644m.json", "uv-mercator-763m.json", "uv-mercator-902m.json", "uv-mercator-1062m.json"]
+writes = ["uv-mercator-*m.json"]
+max_age_hours = 30
+r2_only = true
+namespace = ["python3", "scripts/fetch-mercator.py", "--namespace", "--only=uv-mercator"]
+
+[products.uv-mercator.tiles]
+build = ["python3", "scripts/fetch-mercator.py", "--tiles", "--only=uv-mercator"]
+key = ["python3", "scripts/fetch-mercator.py", "--tile-key", "--only=uv-mercator"]
+cache = "mercator-uv-tiles"
+match = [
+  ["tiles-uv-mercator-*m", "uv-mercator-*m.json"],
 ]

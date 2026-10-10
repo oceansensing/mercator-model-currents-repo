@@ -86,7 +86,9 @@ jobs:
     # A backstop, not the guard: the fetch step's own 30 in products.toml is
     # sized from the measurement, and the dask guard fails the known slow
     # path in seconds. This covers install, checkout, tiles and upload on top.
-    timeout-minutes: 45
+    # Raised 2026-10-10 for the daily-mean levels' step, which runs on
+    # the same lane after the six-hourly one on the day the levels turn over.
+    timeout-minutes: 75
     permissions:
       contents: read
     outputs:
@@ -244,6 +246,12 @@ jobs:
           path: ${{ steps.plan.outputs.cache-paths-mercator-cur-tiles }}
           key: ${{ steps.plan.outputs.cache-key-mercator-cur-tiles }}
 
+      - name: Restore uv tiles
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ${{ steps.plan.outputs.cache-paths-mercator-uv-tiles }}
+          key: ${{ steps.plan.outputs.cache-key-mercator-uv-tiles }}
+
       - name: Fetch, validate, assemble
         id: run
         env:
@@ -267,6 +275,13 @@ jobs:
         with:
           path: ${{ steps.plan.outputs.cache-paths-mercator-cur-tiles }}
           key: ${{ steps.plan.outputs.cache-key-mercator-cur-tiles }}
+
+      - name: Save uv tiles
+        if: steps.run.outputs.built-mercator-uv-tiles == 'true'
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ${{ steps.plan.outputs.cache-paths-mercator-uv-tiles }}
+          key: ${{ steps.plan.outputs.cache-key-mercator-uv-tiles }}
 
       - name: Upload the site
         if: steps.run.outputs.deploy == 'true'
@@ -346,7 +361,7 @@ jobs:
     needs: build
     if: needs.build.outputs.deploy == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     permissions:
       contents: read
     steps:
