@@ -1,0 +1,112 @@
+{
+ "schema": 2,
+ "contract": 1,
+ "generated": "2026-10-10T20:00:37Z",
+ "mode": "full",
+ "run": {
+  "id": "38081695718",
+  "url": "https://github.com/oceansensing/mercator-model-currents-repo/actions/runs/38081695718"
+ },
+ "schedule": {
+  "crons": [
+   "13 1,7,13,19 * * *"
+  ],
+  "longestGapHours": 6.0
+ },
+ "products": {
+  "cur-mercator": {
+   "title": "Mercator Ocean currents",
+   "roots": [
+    "cur-mercator.json",
+    "cur-mercator-47m.json",
+    "cur-mercator-avg200m.json",
+    "cur-mercator-avg350m.json",
+    "cur-mercator-avg1000m.json",
+    "cur-mercator-bottom.json"
+   ],
+   "fate": "fresh",
+   "reason": null,
+   "checked": "2026-10-10T20:00:37Z",
+   "updated": "2026-10-10T19:23:22Z",
+   "hour": "2026-10-10T18:00:00Z",
+   "modelRun": null,
+   "source": "Mercator Ocean / Copernicus Marine",
+   "hours": [
+    "2026-10-10T18:00:00Z",
+    "2026-10-11T00:00:00Z"
+   ],
+   "stale": false,
+   "staleCause": null,
+   "ageHours": 2.01,
+   "nearestOffsetHours": 2.01
+  },
+  "uv-mercator": {
+   "title": "Mercator Ocean currents at each level, daily means",
+   "roots": [
+    "uv-mercator-0m.json",
+    "uv-mercator-2m.json",
+    "uv-mercator-3m.json",
+    "uv-mercator-4m.json",
+    "uv-mercator-5m.json",
+    "uv-mercator-6m.json",
+    "uv-mercator-8m.json",
+    "uv-mercator-10m.json",
+    "uv-mercator-11m.json",
+    "uv-mercator-13m.json",
+    "uv-mercator-16m.json",
+    "uv-mercator-18m.json",
+    "uv-mercator-22m.json",
+    "uv-mercator-25m.json",
+    "uv-mercator-29m.json",
+    "uv-mercator-34m.json",
+    "uv-mercator-40m.json",
+    "uv-mercator-47m.json",
+    "uv-mercator-56m.json",
+    "uv-mercator-66m.json",
+    "uv-mercator-78m.json",
+    "uv-mercator-92m.json",
+    "uv-mercator-110m.json",
+    "uv-mercator-131m.json",
+    "uv-mercator-156m.json",
+    "uv-mercator-186m.json",
+    "uv-mercator-222m.json",
+    "uv-mercator-266m.json",
+    "uv-mercator-318m.json",
+    "uv-mercator-380m.json",
+    "uv-mercator-454m.json",
+    "uv-mercator-541m.json",
+    "uv-mercator-644m.json",
+    "uv-mercator-763m.json",
+    "uv-mercator-902m.json",
+    "uv-mercator-1062m.json",
+    "uv-mercator-1245m.json",
+    "uv-mercator-1452m.json",
+    "uv-mercator-1684m.json",
+    "uv-mercator-1942m.json",
+    "uv-mercator-2225m.json",
+    "uv-mercator-2533m.json",
+    "uv-mercator-2866m.json",
+    "uv-mercator-3221m.json",
+    "uv-mercator-3597m.json",
+    "uv-mercator-3992m.json",
+    "uv-mercator-4405m.json",
+    "uv-mercator-4833m.json",
+    "uv-mercator-5275m.json"
+   ],
+   "fate": "fresh",
+   "reason": null,
+   "checked": "2026-10-10T20:00:37Z",
+   "updated": "2026-10-10T20:00:37Z",
+   "hour": "2026-10-10T00:00:00Z",
+   "modelRun": null,
+   "source": "Mercator Ocean / Copernicus Marine",
+   "hours": [
+    "2026-10-10T00:00:00Z"
+   ],
+   "stale": false,
+   "staleCause": null,
+   "ageHours": 20.01,
+   "nearestOffsetHours": 20.01
+  }
+ }
+}
