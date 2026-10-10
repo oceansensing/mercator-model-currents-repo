@@ -58,7 +58,7 @@ lane = "copernicus"
 timeout_minutes = 30
 
 # **The daily-mean levels, a step of their own on the same lane** (2026-10-10):
-# 72 level reads and 36 roots with their tiles, measured 2026-10-10 on a
+# 98 level reads and 49 roots with their tiles, measured 2026-10-10 on a
 # 16-core Mac at about three seconds a level; the backstop is several times a
 # 4-core runner's expected.
 [steps.mercator-levels]
@@ -126,13 +126,14 @@ match = [
   ["tiles-cur-mercator-bottom-f*h", "cur-mercator-bottom-f*h.json"],
 ]
 
-# **Every level the depth means read, as daily means, R2's alone** (2026-10-10;
-# the site's `scripts/fetch-mercator.py`, LEVELS_KEPT): the 36 levels from 0.494
-# to 1062.440 m, one root a level named for its depth to the meter, read once a
-# day from the variable's daily-mean dataset in a step of its own, so the
-# six-hourly products above never wait on it.
+# **Every level with water, as daily means, R2's alone** (2026-10-10; the
+# site's `scripts/fetch-mercator.py`, LEVELS_KEPT): the 49 levels from 0.494 to
+# 5274.784 m -- the model's 50th, 5727.917 m, holds no water in its daily means --
+# one root a level named for its depth to the meter, read once a day from the
+# variable's daily-mean dataset in a step of its own, so the six-hourly products
+# above never wait on it. The first 36 are the levels the depth means read.
 [products.uv-mercator]
-title = "Mercator Ocean currents at each level to 1062 m, daily means"
+title = "Mercator Ocean currents at each level, daily means"
 step = "mercator-levels"
 roots = ["uv-mercator-0m.json", "uv-mercator-2m.json", "uv-mercator-3m.json", "uv-mercator-4m.json",
          "uv-mercator-5m.json", "uv-mercator-6m.json", "uv-mercator-8m.json", "uv-mercator-10m.json",
@@ -142,7 +143,11 @@ roots = ["uv-mercator-0m.json", "uv-mercator-2m.json", "uv-mercator-3m.json", "u
          "uv-mercator-78m.json", "uv-mercator-92m.json", "uv-mercator-110m.json", "uv-mercator-131m.json",
          "uv-mercator-156m.json", "uv-mercator-186m.json", "uv-mercator-222m.json", "uv-mercator-266m.json",
          "uv-mercator-318m.json", "uv-mercator-380m.json", "uv-mercator-454m.json", "uv-mercator-541m.json",
-         "uv-mercator-644m.json", "uv-mercator-763m.json", "uv-mercator-902m.json", "uv-mercator-1062m.json"]
+         "uv-mercator-644m.json", "uv-mercator-763m.json", "uv-mercator-902m.json", "uv-mercator-1062m.json",
+         "uv-mercator-1245m.json", "uv-mercator-1452m.json", "uv-mercator-1684m.json", "uv-mercator-1942m.json",
+         "uv-mercator-2225m.json", "uv-mercator-2533m.json", "uv-mercator-2866m.json", "uv-mercator-3221m.json",
+         "uv-mercator-3597m.json", "uv-mercator-3992m.json", "uv-mercator-4405m.json", "uv-mercator-4833m.json",
+         "uv-mercator-5275m.json"]
 writes = ["uv-mercator-*m.json"]
 max_age_hours = 30
 r2_only = true
