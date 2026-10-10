@@ -79,9 +79,13 @@ step = "mercator"
 # whatever depth the strided profile happened to reach. It meant 270.301 m
 # until 2026-09-01, and the figure moved with the profile stride.
 roots = ["cur-mercator.json", "cur-mercator-47m.json", "cur-mercator-avg200m.json",
-         "cur-mercator-avg350m.json", "cur-mercator-avg1000m.json"]
+         "cur-mercator-avg350m.json", "cur-mercator-avg1000m.json", "cur-mercator-bottom.json"]
 writes = ["cur-mercator*.json"]
 max_age_hours = 12
+# **The bottom is R2's alone** (2026-10-09, the site pipeline's D13 note): the same
+# pass carried on to each column's deepest wet level, published beside the rest on
+# R2 and left out of the Pages site.
+r2_only = ["cur-mercator-bottom*.json", "tiles-cur-mercator-bottom*"]
 namespace = ["python3", "scripts/fetch-mercator.py", "--namespace", "--only=cur-mercator"]
 
 # **Native resolution, 20 degree boxes, one tier per depth AND per lead.** A
@@ -109,4 +113,6 @@ match = [
   ["tiles-cur-mercator-avg350m-f*h", "cur-mercator-avg350m-f*h.json"],
   ["tiles-cur-mercator-avg1000m", "cur-mercator-avg1000m.json"],
   ["tiles-cur-mercator-avg1000m-f*h", "cur-mercator-avg1000m-f*h.json"],
+  ["tiles-cur-mercator-bottom", "cur-mercator-bottom.json"],
+  ["tiles-cur-mercator-bottom-f*h", "cur-mercator-bottom-f*h.json"],
 ]
