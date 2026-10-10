@@ -62,6 +62,7 @@ job publishes them beside the rest (the site pipeline's D13, its note of
 | root | quantity | grid |
 | --- | --- | --- |
 | `cur-mercator-bottom.json` | the current at each column's deepest wet level, the same pass carried on (with its `-f6h` frame) | global, 1 degree, and 1/12 degree tiles |
+| `uv-mercator-<depth>m.json` (since 2026-10-10's afternoon) | the current at each of the 36 levels from 0.494 to 1062.440 m — every level the 0–200, 0–350 and 0–1000 m means read — one root a level named for its depth to the meter (`-0m` … `-1062m`), daily means, read once a day from the daily-mean dataset in a step of its own (`mercator-levels`) | global, 1 degree, and 1/12 degree tiles |
 
 ## What one frame costs, measured 2026-09-01
 
