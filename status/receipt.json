@@ -1,0 +1,24 @@
+{
+ "schema": 1,
+ "generated": "2026-10-17T13:24:02Z",
+ "mode": "full",
+ "fates": {
+  "cur-mercator": "fresh",
+  "uv-mercator": "fresh"
+ },
+ "reasons": {},
+ "built": {
+  "mercator-cur-tiles": true
+ },
+ "withheld": {
+  "cur-mercator": {},
+  "uv-mercator": {}
+ },
+ "deploy": true,
+ "notes": [],
+ "behind": [],
+ "tile_keys": {
+  "cur-mercator": "cur-mercator20261017T120000Z",
+  "uv-mercator": "uv-mercator20261017T000000Z"
+ }
+}
