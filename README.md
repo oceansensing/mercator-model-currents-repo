@@ -1,6 +1,6 @@
 # mercator-model-currents-repo
 
-Mercator ocean currents for the C4PO ocean map — **the horizontal currents from Mercator Ocean's global 1/12 deg analysis and forecast, at every depth this map publishes**.
+Mercator ocean currents for the oceansensing.org ocean map — **the horizontal currents from Mercator Ocean's global 1/12 deg analysis and forecast, at every depth this map publishes**.
 
 **It publishes, since 2026-09-01.** `pipeline/products.toml` declares the
 products, the workflow builds them four times a day, and the site draws
