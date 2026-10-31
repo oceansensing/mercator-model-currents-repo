@@ -1,0 +1,14 @@
+{
+ "schema": 1,
+ "generated": "2026-10-31T13:15:08Z",
+ "mode": "full",
+ "products": {
+  "cur-mercator": {
+   "tile_key": "cur-mercator20261031T120000Z",
+   "held_key": "cur-mercator20261031T060000Z"
+  },
+  "uv-mercator": {
+   "tile_key": "uv-mercator20261031T000000Z"
+  }
+ }
+}
