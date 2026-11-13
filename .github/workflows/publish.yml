@@ -371,12 +371,16 @@ jobs:
     permissions:
       contents: read
     steps:
+      # The publish, and beside it the writer it packs a tile set into one
+      # archive with (scripts/tile_archive.py).
       - name: Check out the publish script
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           repository: oceansensing/oceansensing.github.io
           path: code
-          sparse-checkout: pipeline
+          sparse-checkout: |
+            pipeline
+            scripts
           ssh-key: ${{ secrets.PIPELINES_SSH_KEY }}
 
       - name: Download the built site
