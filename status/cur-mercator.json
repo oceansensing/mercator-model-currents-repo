@@ -1,0 +1,110 @@
+{
+ "schema": 1,
+ "product": "cur-mercator",
+ "title": "Mercator Ocean currents",
+ "fate": "fresh",
+ "reason": null,
+ "checked": "2026-11-14T13:17:52Z",
+ "updated": "2026-11-14T13:17:52Z",
+ "hour": "2026-11-14T12:00:00Z",
+ "modelRun": null,
+ "source": "Mercator Ocean / Copernicus Marine",
+ "hours": [
+  "2026-11-14T12:00:00Z",
+  "2026-11-14T18:00:00Z"
+ ],
+ "files": {
+  "cur-mercator-47m-f6h.json": {
+   "bytes": 513129
+  },
+  "cur-mercator-47m.json": {
+   "bytes": 512315,
+   "sha256": "ed2c52086bd79c19bd3f2bbe6011a702981d6da00fa1b60910f0d2d6231b64cc"
+  },
+  "cur-mercator-avg1000m-f6h.json": {
+   "bytes": 481068
+  },
+  "cur-mercator-avg1000m.json": {
+   "bytes": 481225,
+   "sha256": "4d2d4b481ecce6fbad8004c9ffd6d8803cfaa18052eaf0407123798dd99201a9"
+  },
+  "cur-mercator-avg200m-f6h.json": {
+   "bytes": 497837
+  },
+  "cur-mercator-avg200m.json": {
+   "bytes": 497527,
+   "sha256": "8116a8e67f25beb343396edb290d67fcd7740869da6da7efe4cedc84b4ab9387"
+  },
+  "cur-mercator-avg350m-f6h.json": {
+   "bytes": 492335
+  },
+  "cur-mercator-avg350m.json": {
+   "bytes": 492293,
+   "sha256": "c3584530de9734933ef72710824cedac7c8219263ac6999c135556d4644c1c47"
+  },
+  "cur-mercator-bottom-f6h.json": {
+   "bytes": 455889
+  },
+  "cur-mercator-bottom.json": {
+   "bytes": 456321,
+   "sha256": "e7cfbcb36cc07c205ee0c0638f0ea709e3c9965e994287ebb5195df964d57c8e"
+  },
+  "cur-mercator-f6h.json": {
+   "bytes": 523395
+  },
+  "cur-mercator.json": {
+   "bytes": 522809,
+   "sha256": "9aa70adb5e87e957652dcd8380d1075f7c095381807f86686dbeb2223d29884f"
+  }
+ },
+ "tiles": {
+  "tiles-cur-mercator": {
+   "state": "fresh",
+   "reason": null
+  },
+  "tiles-cur-mercator-47m": {
+   "state": "fresh",
+   "reason": null
+  },
+  "tiles-cur-mercator-47m-f6h": {
+   "state": "fresh",
+   "reason": null
+  },
+  "tiles-cur-mercator-avg1000m": {
+   "state": "fresh",
+   "reason": null
+  },
+  "tiles-cur-mercator-avg1000m-f6h": {
+   "state": "fresh",
+   "reason": null
+  },
+  "tiles-cur-mercator-avg200m": {
+   "state": "fresh",
+   "reason": null
+  },
+  "tiles-cur-mercator-avg200m-f6h": {
+   "state": "fresh",
+   "reason": null
+  },
+  "tiles-cur-mercator-avg350m": {
+   "state": "fresh",
+   "reason": null
+  },
+  "tiles-cur-mercator-avg350m-f6h": {
+   "state": "fresh",
+   "reason": null
+  },
+  "tiles-cur-mercator-bottom": {
+   "state": "fresh",
+   "reason": null
+  },
+  "tiles-cur-mercator-bottom-f6h": {
+   "state": "fresh",
+   "reason": null
+  },
+  "tiles-cur-mercator-f6h": {
+   "state": "fresh",
+   "reason": null
+  }
+ }
+}
