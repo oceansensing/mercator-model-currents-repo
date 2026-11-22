@@ -31,8 +31,9 @@ arithmetic reaches it.
 
 `PLAN.md` carries the measurements and what is open. `DECISIONS.md` indexes
 the dated one-way decisions. **Which document gets what, and what "update
-docs" means across all twenty repositories, is the doctrine block at the top of
-`CLAUDE.md`** — the same text in all twenty, held equal by the site's
+docs" means across every
+repository of this project, is the doctrine block at the top of
+`CLAUDE.md`** — the same text in each, held equal by the site's
 `check:docs`.
 
 ## What it publishes
