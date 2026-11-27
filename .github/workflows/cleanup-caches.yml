@@ -1,15 +1,6 @@
-name: Clean up caches
+# Daily: delete this repository's Actions caches unused for two days.
 
-# **Each run's caches are keyed to the model run they hold**, so once a newer
-# run arrives an older cache is never restored again, and nothing deleted
-# them: by 2026-10-04 the heaviest of these repositories held 183 caches,
-# 10.8 GB, past GitHub's 10 GB per repository. GitHub drops a cache unused
-# for seven days and, over the limit, the least recently used first; this
-# sweep keeps the total near what the current runs use.
-#
-# Daily, deleting every cache not restored or saved in the last two days.
-# The publish runs here come every few hours, so a cache they still use is
-# never that old. A missed day only waits for the next.
+name: Clean up caches
 
 on:
   schedule:

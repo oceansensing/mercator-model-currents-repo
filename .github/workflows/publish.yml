@@ -1,81 +1,19 @@
-# The Mercator Ocean CURRENTS publish, and this repository holds none of the
-# code that does it.
-#
-# The **fetcher** (`scripts/`) and, since 2026-09-26, the **orchestrator**
-# (`pipeline/`) both live in the private `oceansensing.github.io`, checked out
-# once here at run time as `site/`, and `PIPELINE_ROOT` points the orchestrator
-# at *this* workspace so it publishes this repository's tree from its own
-# `pipeline/products.toml`.
-#
-# **This file is `sentinel3-data-repo`'s with four changes**, kept close so
-# the two can be diffed: the Copernicus credentials on the fetch step, a
-# different dependency pin, its own tile cache pair, and this header.
-#
-# **What is genuinely different: the credentials, and where they are.** The
-# fetcher talks to Copernicus Marine, which takes a username and password --
-# there is no API key -- so `COPERNICUSMARINE_SERVICE_USERNAME` and
-# `_PASSWORD` are secrets on THIS repository and are passed to the step that
-# runs the fetchers. The site's own copy of them is for its measurement
-# workflow and is not what this uses.
-#
-# **This repository is PUBLIC and the site is not.** The toolbox announces
-# which account it logged in as, so `fetch-mercator.py` masks the username and
-# anything email-shaped out of everything it prints, and a self-test holds it
-# there. Do not add a step that echoes the environment.
-#
-# **One Restore/Save pair, `mercator-cur-tiles`**, for the native 1/12-degree
-# tiers -- and Save is skipped every run, because the tiers are written by the
-# fetch pass and the orchestrator marks a cache built only from its own
-# tiles-only step (open, see PLAN). Adding a cache means adding its
-# Restore/Save pair in the same commit -- `plan` warns about a declared cache
-# nothing restores, and about a Restore step whose key no product declares.
-#
-# Cost of one run: two levels and three depth averages at two leads, the full
-# 36-level profile -- 144 level reads. Measured 2026-09-01: 144 reads and every
-# root and tile written in 121 s, a 3.5-minute job (the 12 minutes once quoted
-# was the slow path).
+# Publish this repository's data: built by the pipeline in
+# oceansensing/oceansensing.github.io, which keeps its documentation.
+# Secrets: COPERNICUSMARINE_SERVICE_PASSWORD, COPERNICUSMARINE_SERVICE_USERNAME, PIPELINES_SSH_KEY, R2_ACCESS_KEY_ID, R2_ENDPOINT, R2_SECRET_ACCESS_KEY.
+
 on:
-  # **No `mode` input, because there is no longer a mode.** It offered
-  # `full | light` and passed the choice straight to `orchestrate.py plan
-  # --mode`, which has accepted only `full` since the light path was retired
-  # on 2026-08-27 — so dispatching `light` would fail the run outright.
   workflow_dispatch:
     inputs:
       force:
         description: 'Rebuild even if the probe says the tree is current'
         type: boolean
         default: false
-  # **Was held off until a dispatched run was green and the fetcher had a
-  # probe.** Both are true as of 2026-09-01. The siblings each
-  # learned this: a cron firing before `PIPELINES_SSH_KEY` can read the
-  # private site repository spins runners to fail at the same step, and a
-  # publish tree that has never been built once has nothing for the stage to
-  # be seeded from. The deploy key went on 2026-08-31; turn the schedule on
-  # after a dispatched run publishes a tree, not before.
   schedule:
-    # **On from 2026-09-01, and the probe is what made it affordable.**
-    # Upstream moves 6-hourly, and until today every run paid the whole fetch
-    # -- every frame, tens of minutes on the slow path -- because this fetcher had no probe-first exit. It has
-    # one now: it reads the upstream's time axis, which is metadata and about
-    # 5 s, and compares it against the `refTime` already on disk. A run with
-    # nothing new costs that 5 s.
-    #
-    # It also rebuilds when THIS SCRIPT would publish something the disk does
-    # not have -- a root added, a depth split out -- because a probe watching
-    # only the upstream cannot see a change in us.
-    #
-    # Four a day: enough to pick up a new run within a few hours, few enough
-    # that the probe is not the whole point of the exercise. The minute is
-    # offset from every sibling's so no two pipelines read upstream together.
     - cron: '13 1,7,13,19 * * *'
 
-# Nothing at workflow level: each job says what it holds, and the job that
-# runs `pip install` and the fetchers holds nothing worth stealing.
 permissions: {}
 
-# One publish at a time. `cancel-in-progress: false` on purpose — a run that
-# is already fetching should finish rather than be discarded, and a newer one
-# queues behind it.
 concurrency:
   group: publish
   cancel-in-progress: false
@@ -83,11 +21,6 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    # A backstop, not the guard: the fetch step's own 30 in products.toml is
-    # sized from the measurement, and the dask guard fails the known slow
-    # path in seconds. This covers install, checkout, tiles and upload on top.
-    # Raised 2026-10-10 for the daily-mean levels' step, which runs on
-    # the same lane after the six-hourly one on the day the levels turn over.
     timeout-minutes: 75
     permissions:
       contents: read
@@ -95,43 +28,9 @@ jobs:
       deploy: ${{ steps.run.outputs.deploy }}
       behind: ${{ steps.run.outputs.behind }}
     steps:
-      # This repository first: actions/checkout cleans its destination, so
-      # taking the root after the others would wipe them.
       - name: Check out this repository
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      # The fetchers and the published contract, one copy, in the repository
-      # the map lives in.
-      #
-      # **That repository is private, and the deploy key below is the only
-      # reason this can read it.** With no credential `actions/checkout` falls
-      # back to this workflow's own GITHUB_TOKEN, which is scoped to this
-      # repository and holds no grant on the site — a 404 that would take down
-      # every product at once rather than one.
-      #
-      # A deploy key over a PAT or an App, on what this step actually needs:
-      # it reads exactly one repository and writes nothing. The *scope* is by
-      # construction — a deploy key reaches one repository and no other — and
-      # the **read-only part is a checkbox**, "Allow write access", which must
-      # be left unchecked. Nothing here pushes to the site repository, and
-      # this job runs `pip install`, `npm ci` and four fetch scripts against
-      # public servers, so write access here would put the repository that
-      # deploys the public site inside that blast radius.
-      #
-      # It also does not expire, where a fine-grained PAT stops the whole
-      # pipeline dead on its expiry date, and it belongs to no person, so it
-      # survives somebody leaving the org.
-      #
-      # **Its own key, not the one `realtime-data-repo` uses.** A repository
-      # may hold many deploy keys, and one per consumer means revoking or
-      # rotating one does not take the other down. The public half goes on the
-      # site repository's Deploy keys page with write access unchecked; the
-      # private half is the secret named here.
-      #
-      # The hazard in the ordering, measured once already: the secret **arms**
-      # this path the moment it exists, because a non-empty `ssh-key` sends
-      # `actions/checkout` down SSH and the HTTPS fallback is not consulted.
-      # Put the key on the site repository first, then set the secret here.
       - name: Check out the pipelines
         id: pipelines
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -141,12 +40,6 @@ jobs:
           path: site
           ssh-key: ${{ secrets.PIPELINES_SSH_KEY }}
 
-      # **The message a failure gives is not the message anybody needs.** Over
-      # HTTPS `actions/checkout` says "Repository not found", which is true and
-      # points at the wrong thing; over SSH it says "Permission denied
-      # (publickey)", which names the mechanism and not the fix. Scoped to this
-      # step's own outcome rather than a bare `if: failure()`, which would
-      # attach this explanation to any earlier failure in the job.
       - name: Say why the pipelines could not be checked out
         if: failure() && steps.pipelines.outcome == 'failure'
         run: |
@@ -155,16 +48,6 @@ jobs:
           echo "::error title=If the log says only 'Permission denied (publickey)'::The key parsed but the server would not take it. The public half is missing from the site repository's Deploy keys page, or was revoked, or does not match this private half."
           echo "::error title=If the log says 'Repository not found'::No credential was used at all - the secret is unset or empty, so actions/checkout fell back to this workflow's GITHUB_TOKEN, which holds no grant on the site repository."
 
-      # **The orchestrator is in the site checkout above** (`site/pipeline/`),
-      # since 2026-09-26: the pipeline's code moved from the public
-      # realtime-data-repo to the private site repository, which this run
-      # already reads with its deploy key. `PIPELINE_ROOT` below is what lets
-      # it operate on this tree while living in that one.
-
-      # The last publish — the seed, the previous manifests, and the whole of
-      # what a held product falls back to. Tolerated missing exactly once:
-      # before the branch has ever been pushed, the orchestrator starts cold
-      # and says so.
       - name: Check out the last publish
         continue-on-error: true
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -180,16 +63,6 @@ jobs:
         with:
           node-version: '22'
 
-      # A broken orchestrator refuses to run rather than publishing something
-      # strange with green ticks. Run from the site's checkout, where the
-      # pipeline's code and its tests live.
-      # **What the fetcher needs, and why one line covers it.**
-      # `copernicusmarine` is the only route in: Copernicus retired OPeNDAP,
-      # ERDDAP, MOTU, FTP and WMS in April 2024, so there is nothing the
-      # standard library can talk to. It pulls xarray, zarr, dask and boto3
-      # behind it, which is why it is pinned — a numeric stack that changed
-      # under the fetcher would publish numbers rather than an error. It
-      # installs in 22 s, measured.
       - name: Install what the fetcher needs
         run: pip install --no-cache-dir -r site/scripts/requirements-mercator.txt
 
@@ -197,11 +70,6 @@ jobs:
         working-directory: site
         run: python3 pipeline/test_orchestrate.py
 
-      # The fetcher's own checks, run before it is allowed near a publish.
-      # They cost no network: the tile lattice, the band grouping, the
-      # encoding and the composite are all arithmetic, and each was
-      # mutation-tested when written. The band check exists because an
-      # inverted span published an 8 KB overview and exited 0.
       - name: Self-test the fetcher
         run: python3 site/scripts/fetch-mercator.py --self-test
 
@@ -214,36 +82,10 @@ jobs:
         id: plan
         env:
           PIPELINE_ROOT: ${{ github.workspace }}
-          # **The credentials belong here too, and the first tiled run is how
-          # I found out.** `plan` runs each product's `--tile-key` probe to
-          # build a cache key, and that probe reads the upstream's time axis --
-          # so without them it fails, `plan` reports "tiles unplanned this
-          # run", and the tier is silently never built. The failure names the
-          # tiles, not the credentials, which is what makes it worth a comment.
           COPERNICUSMARINE_SERVICE_USERNAME: ${{ secrets.COPERNICUSMARINE_SERVICE_USERNAME }}
           COPERNICUSMARINE_SERVICE_PASSWORD: ${{ secrets.COPERNICUSMARINE_SERVICE_PASSWORD }}
         run: python3 site/pipeline/orchestrate.py plan --mode full
 
-      # **One Restore and one Save per `cache` name in products.toml.** Nothing
-      # loops here, because a matrix would need separate jobs — so this pair
-      # is the list a new product silently escapes, and the orchestrator's
-      # `plan` names any declared cache with neither step. That failure is
-      # invisible otherwise: a cache nothing restores is not an error, it is
-      # tiles rebuilt from scratch every run, with correct output.
-      #
-      # **`restore-keys` is the published hour's key, and nothing wider**
-      # (2026-10-14). The prefix restores of the light runs went with them on
-      # 2026-08-28; this is one complete key, the one the last publish's tiles
-      # are under, which `plan` names as `cache-held-<name>` whenever the
-      # probe names another hour, and leaves empty, and inert, when it does
-      # not. A miss on the probe's key restores what is published; the
-      # orchestrator keeps it aside while the steps run and puts it back if
-      # the product is held, so a hold after a probe that answered keeps its
-      # tiles.
-      # **A tier at native resolution, so a cache hit is worth minutes.** The
-      # tiles are slices of the frame the overview came from, so restoring them
-      # when the hour has not moved skips the serialisation rather than the
-      # fetch -- which for the currents is ten tiers of 20 degree boxes.
       - name: Restore cur tiles
         uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
@@ -262,18 +104,10 @@ jobs:
         id: run
         env:
           PIPELINE_ROOT: ${{ github.workspace }}
-          # **The escape a probe needs, and it was earned.** The probe compares
-          # the upstream's hour against what is on the stage -- and the stage
-          # is seeded from the last publish, INCLUDING a publish that was held
-          # for failing the contract. So a bad file on the stage matches its
-          # own refTime, the probe skips the rebuild, and the contract refuses
-          # the same bad file for ever. Nothing upstream changing can break
-          # that loop. This is how it is broken.
           MERCATOR_FORCE: ${{ inputs.force }}
           COPERNICUSMARINE_SERVICE_USERNAME: ${{ secrets.COPERNICUSMARINE_SERVICE_USERNAME }}
           COPERNICUSMARINE_SERVICE_PASSWORD: ${{ secrets.COPERNICUSMARINE_SERVICE_PASSWORD }}
         run: python3 site/pipeline/orchestrate.py run
-
 
       - name: Save cur tiles
         if: steps.run.outputs.built-mercator-cur-tiles == 'true'
@@ -295,10 +129,7 @@ jobs:
         with:
           path: out
 
-      # What this origin publishes to R2 alone (the site pipeline's D13, its
-      # note of 2026-10-09), and R2's whole status: the R2 job lays it beside
-      # the site. Public for the day it is kept, so open data only.
-      - name: Hand on what R2 alone carries
+      - name: Upload the second tree
         if: steps.run.outputs.deploy == 'true'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
@@ -317,8 +148,6 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    # Only this job publishes, so only this job holds the write scopes. The
-    # build job runs `pip install` and the fetchers and holds neither.
     permissions:
       contents: write
       pages: write
@@ -332,9 +161,6 @@ jobs:
           name: branch-out
           path: branch-out
 
-      # `published` is an orphan branch, force-pushed each run: it is a
-      # snapshot of the last publish rather than a history, and banking every
-      # version of every grid forever is what filled the predecessor.
       - name: Publish the branch
         run: |
           cd branch-out
@@ -353,16 +179,6 @@ jobs:
         if: needs.build.outputs.deploy == 'true'
         uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
 
-
-  # **The R2 publish** (since 2026-09-24; the site pipeline's D12: R2
-  # stands on its own, and a comparison with Pages is a feature, never
-  # a requirement).
-  # The tree this run built, published to Cloudflare R2 under this
-  # repository's name — beside the Pages deploy, not after it: it needs only
-  # the build and its publish decision, so a Pages outage never stops it and
-  # a failure here never touches Pages. Only what changed is uploaded, and
-  # the bucket is then compared file by file with what the run built.
-  # `pipeline/publish_r2.py` in oceansensing.github.io has the rules.
   publish-r2:
     needs: build
     if: needs.build.outputs.deploy == 'true'
@@ -371,8 +187,6 @@ jobs:
     permissions:
       contents: read
     steps:
-      # The publish, and beside it the writer it packs a tile set into one
-      # archive with (scripts/tile_archive.py).
       - name: Check out the publish script
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -389,7 +203,7 @@ jobs:
           name: github-pages
           path: pages
 
-      - name: Download what R2 alone carries
+      - name: Download the second tree
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: r2-only
@@ -398,13 +212,11 @@ jobs:
       - name: Test the publish script
         run: python3 code/pipeline/test_publish_r2.py
 
-      - name: Publish to R2
+      - name: Publish to storage
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
-          # The CLI's newer default checksums are not every S3-compatible
-          # store's; ask for them only where an operation requires them.
           AWS_REQUEST_CHECKSUM_CALCULATION: when_required
           AWS_RESPONSE_CHECKSUM_VALIDATION: when_required
         run: |

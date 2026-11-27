@@ -1,112 +1,12 @@
 # mercator-model-currents-repo
 
-Mercator ocean currents for the ocean map — **the horizontal currents from Mercator Ocean's global 1/12 deg analysis and forecast, at every depth this map publishes**.
+The horizontal currents from Mercator Ocean's global 1/12° analysis and
+forecast, as gridded data for the oceansensing.org ocean map: at 0.49 m and
+47 m, the means over the top 200, 350 and 1000 m, at each column's deepest
+wet level, and at each of the model's levels with water in it.
 
-**It publishes, since 2026-09-01.** `pipeline/products.toml` declares the
-products, the workflow builds them four times a day, and the site draws
-**five current fields: two levels and three depth averages** —
+Updated four times a day.
 
-| root | what it is |
-| --- | --- |
-| `cur-mercator.json` | the current AT 0.49 m |
-| `cur-mercator-47m.json` | the current AT 47.37 m |
-| `cur-mercator-avg200m.json` | the **mean** over 0–200 m |
-| `cur-mercator-avg350m.json` | the **mean** over 0–350 m |
-| `cur-mercator-avg1000m.json` | the **mean** over 0–1000 m |
+## Sources and credits
 
-**A level says its own depth; a cap says `-avg` and a round number.** The two
-are different quantities and the names have to make that unmissable: a
-velocity at 186 m is not a 0–200 m mean, and publishing the first under the
-second's name is the mistake this set exists to avoid. So a level is labelled
-with the depth that is actually there — 47 m, not ESPC's 50 — while a cap is
-labelled with the depth it integrates **to**.
-
-**And it does reach that depth.** The caps are thickness-weighted means over
-**every model level** to the cap, clipped to it: each covers exactly 200.000,
-350.000 and 1000.000 m, with no sampling stride between the levels. Until
-2026-09-01 they did not — `-avg200m` was a mean over 0–270.301 m, and the
-covered depth moved with the profile stride — which is recorded in `PLAN.md`
-because a name containing a number needs something checking that the
-arithmetic reaches it.
-
-`PLAN.md` carries the measurements and what is open. `DECISIONS.md` indexes
-the dated one-way decisions. **Which document gets what, and what "update
-docs" means across every
-repository of this project, is the doctrine block at the top of
-`CLAUDE.md`** — the same text in each, held equal by the site's
-`check:docs`.
-
-## What it publishes
-
-| | |
-| --- | --- |
-| source | Mercator Ocean International, via Copernicus Marine (CMEMS) |
-| product | `GLOBAL_ANALYSISFORECAST_PHY_001_024` |
-| dataset | `cmems_mod_glo_phy-cur_anfc_0.083deg_PT6H-i` |
-| variables | `uo`, `vo` |
-| resolution | **0.083 deg (1/12 deg)**, 2041 x 4320 global |
-| cadence | 6-hourly, with forecast to +9 days |
-| access | the `copernicusmarine` toolbox over Zarr; account required |
-
-The tree goes to GitHub Pages at
-<https://oceansensing.org/mercator-model-currents-repo/>. The same tree also
-goes to a second host, Cloudflare R2, under this
-repository's name; the site's `pipeline/publish_r2.py` has the rules.
-
-## Published to R2 alone (since 2026-10-10)
-
-Declared `r2_only` in `pipeline/products.toml`: the same run builds these,
-they are left out of this repository's Pages site and its status, and the R2
-job publishes them beside the rest (the site pipeline's D13, its note of
-2026-10-09). Their roots stay on the `published` branch, as every product's do.
-
-| root | quantity | grid |
-| --- | --- | --- |
-| `cur-mercator-bottom.json` | the current at each column's deepest wet level, the same pass carried on (with its `-f6h` frame) | global, 1 degree, and 1/12 degree tiles |
-| `uv-mercator-<depth>m.json` (since 2026-10-10's afternoon) | the current at each of the 49 levels from 0.494 to 5274.784 m — every level of the model with water in its daily means (the 50th, 5727.917 m, holds none); the first 36 are those the 0–200, 0–350 and 0–1000 m means read — one root a level named for its depth to the meter (`-0m` … `-5275m`), daily means, read once a day from the daily-mean dataset in a step of its own (`mercator-levels`) | global, 1 degree, and 1/12 degree tiles |
-
-## What one frame costs, measured 2026-09-01
-
-| | |
-| --- | --- |
-| one global frame | **33.6 MB** float32 |
-| currents transfer | 0.9 MB/s (36 s a frame) |
-| scalar transfer | 3.6 MB/s (9 s a frame) |
-| depths | 50 levels, 0.49 m to 5727.92 m, priced individually |
-| toolbox install | 22 s |
-| **fetch step, no dask, four reads in flight** | **102 s** for 80 level reads and ten roots with tiles (run 33551023284, 4-cpu runner) |
-| one level, that way | about **0.65 s** |
-| **the full 36-level profile**, both leads, ten roots with tiles | **121 s** (run 33556402912, 3.5-minute job) |
-
-**Every transfer figure above was measured through the toolbox's DEFAULT dask
-blocks, which read about 26x the bytes a level needs** (found 2026-09-01: 50.7 s
-a level that way, 1.9 s with `chunk_size_limit=0`, on the same store). They
-were true of a path the build no longer takes. The fetcher opens with no dask
-now and refuses a dask-backed array; the site's `PLAN.md` carries the
-measurement and the runner's own numbers are in the run logs, timestamped per
-line.
-
-A build is 144 level reads at two leads, 121 s on a 4-cpu runner
-(run 33556402912); the "20 frames, 672 MB, 12.5 minutes" once quoted here
-priced a five-point-depth set on the slow path and describes neither the set
-nor the path now. `PLAN.md` has the reasoning.
-
-## Why a second model at all
-
-ESPC stalls, and not in a way retrying fixes: on 2026-08-31 `tds.hycom.org`
-refused every connection for hours, every ESPC tile tier was withdrawn from
-the live map, and all five products were briefly held. A different model is
-the only answer to a run that goes late. This one is the like-for-like
-option — same 1/12 deg, currents and temperature and salinity together.
-
-**It is a PEER, not a fallback** (the owner's call, 2026-09-01). Both models
-are fetched every run and the reader chooses; the contract already carries
-`source` and `modelRun`, and the map already shows them, so which ocean is on
-screen is visible rather than inferred.
-
-## Credentials
-
-Two repository secrets, `COPERNICUSMARINE_SERVICE_USERNAME` and
-`COPERNICUSMARINE_SERVICE_PASSWORD`. **There is no API key** — the toolbox
-takes a username and password and nothing else, and the username is not the
-account email. A Copernicus Marine account is free.
+Generated using E.U. Copernicus Marine Service Information: Mercator Ocean International's Global Ocean Physics Analysis and Forecast, <https://doi.org/10.48670/moi-00016>. Its terms: the [Copernicus Marine Service Commitments and Licence](https://marine.copernicus.eu/user-corner/service-commitments-and-licence).
